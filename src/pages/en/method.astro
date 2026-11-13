@@ -1,0 +1,35 @@
+---
+/** Method: texts, rules, tests and limits. Every figure comes from params-2026.json. */
+import PageLayout from '../../layouts/PageLayout.astro';
+import { route } from '../../i18n/routes';
+import { KIT as K } from '../../lib/kit';
+import { srcLink } from '../../lib/helpers';
+import { breadcrumbSchema, webPageSchema } from '../../lib/seo';
+import { displayDate, formatMoney } from '../../lib/format';
+const lang = 'en';
+const path = route('method', lang);
+const P = K.P, X = P.exoneration, U = P.usage, PPL = P.ppl;
+const title = 'Titres Resto method 2026: sources, rules, tests and limits';
+const description = 'How Titres Resto calculates: texts re-read (service-public.fr, CNTR, Senate), order of the rules, test cases, limits of the maths and how figures are updated.';
+const s = (k: string, t: string) => srcLink(k, lang, t);
+const d = (x: string) => displayDate(x, 'en-GB');
+const eur = (x: number, dd = 0) => formatMoney(x, dd, lang);
+const f = K.fourchetteOptimale();
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[webPageSchema({ name: 'Method', description, path, lang }), breadcrumbSchema([{ name: 'Home', path: route('home', lang) }, { name: 'Method', path }])]} breadcrumbs={[{ label: 'Method' }]}>
+  <article class="prose prose-slate max-w-none">
+    <h1>Titres Resto method: how the simulators calculate</h1>
+    <p>Under the Titres Resto method, every calculation runs in your browser, using rules written from public texts re-read on {d(P.retrieved_at)}: the <Fragment set:html={s('sp', 'service-public.fr guidance on meal vouchers')} />, the site of the <Fragment set:html={s('cntr', 'National Meal Voucher Commission')} />, <Fragment set:html={s('rapport', `Senate report no. ${PPL.rapport}`)} /> and both versions of the bill, the <Fragment set:html={s('texteAN', 'text passed by the National Assembly')} /> and the <Fragment set:html={s('texteCommission', 'Senate committee text')} />. Nothing you type leaves your device.</p>
+    <div class="not-prose text-xs font-medium uppercase tracking-wide text-navy-500">Independent site: not a voucher issuer or a public body</div>
+    <h2>The order of the rules</h2>
+    <p>For the employer share, the simulator first works out the employer part of one voucher, then checks that it is between {X.tauxMin}% and {X.tauxMax}% of face value; outside that band, the exemption is zero. Within the band, it compares the employer share with {eur(X.plafond['2026'], 2)} and adds back only the excess. For a purchase, it checks in turn the day (Sunday or public holiday: working that day and employer permission), the product (alcohol and non-food excluded, groceries to cook depending on the year and the vote), then the {eur(U.plafondJour)} daily limit. For validity, it adds two months (card) or one month (paper) to the end of the voucher's year, then fifteen days to exchange.</p>
+    <h2>What is calculated and what is not</h2>
+    <p>Amounts are exact under the 2026 rules: exempt share, share added back, deduction, monthly credit, annual cost before fees. The exemption cap for 2027 vouchers had not been published as of {d(P.retrieved_at)}: no 2027 figure is shown. The daily limits a decree would set if the Senate version passed are unknown and are not made up. Issuer fees, each chain's product lists and card-specific rules are not calculated.</p>
+    <h2>Assumptions about the bill</h2>
+    <p>Until the law is enacted, every 2027 and 2028 rule is shown as an assumption: bill passed or rejected, National Assembly version or the Senate committee version of {d(PPL.commission)}. The Senate plenary debate is scheduled for {d(PPL.seanceSenat)}. The <Fragment set:html={s('dossier', 'legislative file')} /> is re-read at each stage.</p>
+    <h2>Tests</h2>
+    <p>The rules have automated tests drawn from the texts: the {eur(f.min, 2)} to {eur(f.max, 2)} range given by the Senate report, a €14 voucher at 60% with €1.08 added back, a 70% rate that removes the whole exemption, a €32 bill cut to €25, a 2026 card voucher valid until 28 February 2027. The site does not build if a test fails.</p>
+    <h2>How the Titres Resto method is kept up to date</h2>
+    <p>Figures are re-read by hand at each official publication: a new exemption cap, the vote on the bill, a decree on daily limits. There is no automatic update. If you spot an error, write to us from the <a href={route('contact', lang)}>contact</a> page; how we correct is described in the <a href={route('editorial', lang)}>editorial policy</a>. Information taken from service-public.fr is reused under the Licence Ouverte 2.0.</p>
+  </article>
+</PageLayout>

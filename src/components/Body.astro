@@ -1,0 +1,21 @@
+---
+/**
+ * Le corps HTML d'un fichier de contenu.
+ * `plegar` (pages de sujet) : la première partie H2 reste ouverte, les suivantes se replient sous leur titre
+ * cliquable (<details>, tout reste dans le HTML).
+ */
+interface Props { html: string; plegar?: boolean }
+const { html, plegar = false } = Astro.props;
+const sections = plegar ? html.split(/(?=<h2[\s>])/) : [html];
+const premierH2 = sections.findIndex((x) => /^<h2[\s>]/.test(x));
+const plie = (i: number) => plegar && premierH2 >= 0 && i > premierH2;
+const titre = (x: string) => { const m = x.match(/^<h2[^>]*>([\s\S]*?)<\/h2>/); return m ? { h: m[1], reste: x.slice(m[0].length) } : { h: '', reste: x }; };
+---
+<div class="prose prose-slate max-w-none">
+  {sections.map((sec, si) => {
+    const t = plie(si) ? titre(sec) : { h: '', reste: sec };
+    return plie(si)
+      ? <details class="fold"><summary><h2 class="fold-h" set:html={t.h} /></summary><div class="pb-2"><Fragment set:html={t.reste} /></div></details>
+      : <Fragment set:html={t.reste} />;
+  })}
+</div>

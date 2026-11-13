@@ -1,0 +1,20 @@
+{
+ "accent": "#A33A1C",
+ "symbol": "TR",
+ "variants": [
+  {
+   "file": "og-fr.png",
+   "title": "Titres-restaurant 2026-2027\npart employeur et règles d'usage",
+   "subtitle": "7,32 € exonérés · 25 € par jour · dimanche · supermarché · réforme",
+   "badge": "Code du travail · service-public.fr · Sénat, novembre 2026",
+   "brand": "Titres Resto"
+  },
+  {
+   "file": "og-en.png",
+   "title": "French meal vouchers 2026-2027\nemployer share and spending rules",
+   "subtitle": "€7.32 exempt · €25 a day · Sundays · supermarkets · reform",
+   "badge": "Labour Code · service-public.fr · Senate, November 2026",
+   "brand": "Titres Resto"
+  }
+ ]
+}

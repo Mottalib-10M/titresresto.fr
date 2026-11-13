@@ -1,0 +1,21 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE_URL } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { breadcrumbSchema } from '../../lib/seo';
+const lang = 'fr';
+const code = `<iframe src="${SITE_URL}/embed/${lang}/simulateur-titres-restaurant/" title="Simulateur titres-restaurant 2026" width="100%" height="900" style="border:0;max-width:1100px" loading="lazy"></iframe>`;
+---
+<PageLayout title="Intégrer gratuitement le simulateur titres-restaurant 2026" description="Intégrez gratuitement par une iframe le simulateur titres-restaurant 2026 : part employeur, retenue sur la paie et exonération. Les chiffres se mettent à jour seuls." lang={lang} noindex={true} jsonLd={[breadcrumbSchema([{ name: lang === 'fr' ? 'Accueil' : 'Home', path: route('home', lang) }, { name: 'Widget', path: route('widget', lang) }])]} breadcrumbs={[{ label: 'Widget' }]} showAuthor={false}>
+  <header class="mb-6">
+    <h1 class="text-3xl font-bold text-navy-900 md:text-4xl">Intégrer le simulateur</h1>
+    <p class="mt-3 text-lg text-navy-700">Pour les comités sociaux et économiques, les services RH et les associations : vous copiez le code une fois, et les nouveaux plafonds apparaissent seuls.</p>
+  </header>
+  <div class="prose prose-slate max-w-none">
+    <pre class="overflow-x-auto rounded-lg bg-navy-900 p-4 text-sm text-white"><code>{code}</code></pre>
+    <p set:html={`Pour la version anglaise, remplacez <code>/embed/fr/</code> par <code>/embed/en/</code>. Conditions : le lien sous le simulateur reste visible, il n'est pas modifié et il est fourni sans garantie. Ce que tapent vos lecteurs reste sur leur appareil. Le simulateur n'est ni celui d'un émetteur ni celui d'une administration.`} />
+  </div>
+  <div class="mt-8 overflow-hidden rounded-xl border border-navy-200">
+    <iframe src={`/embed/${lang}/simulateur-titres-restaurant/`} title="Simulateur titres-restaurant 2026" width="100%" height="900" style="border:0" loading="lazy"></iframe>
+  </div>
+</PageLayout>

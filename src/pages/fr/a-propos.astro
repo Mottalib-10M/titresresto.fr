@@ -1,0 +1,29 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { route } from '../../i18n/routes';
+import { AUTHOR_NAME, AUTHOR_DESC, CONTACT_EMAIL } from '../../data/site-config';
+import { srcLink } from '../../lib/helpers';
+import { profilePageSchema, breadcrumbSchema } from '../../lib/seo';
+const lang = 'fr';
+const path = route('about', lang);
+const title = 'Titres Resto : éditeur indépendant de simulateurs, 2026';
+const description = 'Radif Partners publie Titres Resto : simulateurs gratuits des titres-restaurant, établis sur les textes officiels de 2026. Ni émetteur, ni administration.';
+const s = (k: string, t: string) => srcLink(k, lang, t);
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[profilePageSchema({ path, lang }), breadcrumbSchema([{ name: 'Accueil', path: route('home', lang) }, { name: 'À propos', path }])]} breadcrumbs={[{ label: 'À propos' }]}>
+  <article class="prose prose-slate max-w-none">
+    <h1>À propos de Titres Resto</h1>
+    <p>{AUTHOR_DESC.fr}</p>
+    <div class="not-prose text-xs font-medium uppercase tracking-wide text-navy-500">Site indépendant : ni émetteur de titres, ni administration</div>
+    <h2>Pourquoi ce site existe</h2>
+    <p>Les règles du titre-restaurant sont simples une par une, mais elles se croisent : fourchette de 50 à 60 %, plafond d'exonération par titre, plafond de dépense par jour, jours ouvrables, millésimes, et désormais une proposition de loi en deux versions. Les pages des émetteurs parlent surtout de leurs cartes ; les articles de presse donnent des dates sans les sources. Ici, chaque règle devient un calcul, avec le texte à côté, et ce qui n'est pas encore voté est présenté comme une hypothèse.</p>
+    <h2>Une entreprise, pas une administration</h2>
+    <p>{AUTHOR_NAME} est une entreprise qui construit des calculateurs à partir de textes publics. Ce n'est ni un émetteur de titres-restaurant, ni un employeur, ni un cabinet de conseil. Le site n'utilise aucun logo d'administration ou d'émetteur, ne vend rien, n'a pas de lien d'affiliation et ne recueille aucune coordonnée.</p>
+    <LegalIdentity lang={lang} />
+    <h2>Les sources</h2>
+    <p>Les chiffres viennent de la <Fragment set:html={s('sp', 'fiche service-public.fr')} />, de la <Fragment set:html={s('cntr', 'CNTR')} /> et des textes du Sénat sur la proposition de loi, dont le <Fragment set:html={s('rapport', 'rapport de la commission des affaires sociales')} />. La <a href={route('method', lang)}>méthode</a> explique comment ils sont appliqués et la <a href={route('editorial', lang)}>politique éditoriale</a>, comment ils sont corrigés.</p>
+    <h2>Écrivez-nous</h2>
+    <p><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>, si un chiffre vous semble mal lu ou si un cas est mal traité par un simulateur. Pour votre carte ou votre solde, adressez-vous à votre employeur ou à votre émetteur.</p>
+  </article>
+</PageLayout>

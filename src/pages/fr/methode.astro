@@ -1,0 +1,35 @@
+---
+/** Méthode : textes, règles, tests et limites. Chaque chiffre vient de params-2026.json. */
+import PageLayout from '../../layouts/PageLayout.astro';
+import { route } from '../../i18n/routes';
+import { KIT as K } from '../../lib/kit';
+import { srcLink } from '../../lib/helpers';
+import { breadcrumbSchema, webPageSchema } from '../../lib/seo';
+import { displayDate, formatMoney } from '../../lib/format';
+const lang = 'fr';
+const path = route('method', lang);
+const P = K.P, X = P.exoneration, U = P.usage, PPL = P.ppl;
+const title = 'Méthode de Titres Resto 2026 : textes, règles et limites';
+const description = 'Comment Titres Resto calcule : textes relus (service-public.fr, CNTR, Sénat), ordre des règles, cas de test, limites du calcul et mise à jour des chiffres.';
+const s = (k: string, t: string) => srcLink(k, lang, t);
+const d = (x: string) => displayDate(x, 'fr-FR');
+const eur = (x: number, dd = 0) => formatMoney(x, dd, lang);
+const f = K.fourchetteOptimale();
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[webPageSchema({ name: 'Méthode', description, path, lang }), breadcrumbSchema([{ name: 'Accueil', path: route('home', lang) }, { name: 'Méthode', path }])]} breadcrumbs={[{ label: 'Méthode' }]}>
+  <article class="prose prose-slate max-w-none">
+    <h1>Méthode de Titres Resto : comment calculent les simulateurs</h1>
+    <p>Avec la méthode de Titres Resto, tous les calculs se font dans votre navigateur, à partir de règles écrites d'après des textes publics relus le {d(P.retrieved_at)} : la <Fragment set:html={s('sp', 'fiche service-public.fr sur les titres-restaurant')} />, le site de la <Fragment set:html={s('cntr', 'Commission nationale des titres-restaurant')} />, le <Fragment set:html={s('rapport', `rapport du Sénat n° ${PPL.rapport}`)} /> et les deux versions de la proposition de loi, le <Fragment set:html={s('texteAN', 'texte adopté par l\'Assemblée nationale')} /> et le <Fragment set:html={s('texteCommission', 'texte de la commission du Sénat')} />. Rien de ce que vous tapez ne quitte votre appareil.</p>
+    <div class="not-prose text-xs font-medium uppercase tracking-wide text-navy-500">Site indépendant : ni émetteur de titres, ni administration</div>
+    <h2>L'ordre des règles</h2>
+    <p>Pour la part de l'employeur, le simulateur calcule d'abord la part patronale d'un titre, puis vérifie qu'elle est comprise entre {X.tauxMin} % et {X.tauxMax} % de la valeur faciale ; hors de cette fourchette, l'exonération est nulle. Dans la fourchette, il compare la part patronale à {eur(X.plafond['2026'], 2)} et réintègre seulement l'excédent. Pour un achat, il vérifie dans l'ordre le jour (dimanche ou jour férié : travail ce jour-là et accord de l'employeur), le produit (alcool et non-alimentaire exclus, courses à cuisiner selon l'année et le vote), puis le plafond de {eur(U.plafondJour)} par jour. Pour la validité, il ajoute deux mois (carte) ou un mois (papier) à la fin de l'année du millésime, puis quinze jours d'échange.</p>
+    <h2>Ce qui est calculé et ce qui ne l'est pas</h2>
+    <p>Les montants sont exacts pour les règles de 2026 : part exonérée, part réintégrée, retenue, crédit du mois, coût annuel hors frais. Le plafond d'exonération des titres de 2027 n'était pas publié au {d(P.retrieved_at)} : aucun chiffre 2027 n'est affiché. Les plafonds journaliers que fixerait un décret si la version du Sénat était votée ne sont pas connus et ne sont pas inventés. Les frais des émetteurs, les listes de produits de chaque enseigne et les règles propres à chaque carte ne sont pas calculés.</p>
+    <h2>Hypothèses sur la proposition de loi</h2>
+    <p>Tant que la loi n'est pas promulguée, chaque règle de 2027 et de 2028 est montrée comme une hypothèse : texte voté ou rejeté, version de l'Assemblée ou version de la commission du Sénat du {d(PPL.commission)}. La séance publique du Sénat est prévue le {d(PPL.seanceSenat)}. Le <Fragment set:html={s('dossier', 'dossier législatif')} /> est relu à chaque étape.</p>
+    <h2>Tests</h2>
+    <p>Les règles ont des tests automatiques tirés des textes : la fourchette de {eur(f.min, 2)} à {eur(f.max, 2)} donnée par le rapport du Sénat, un titre de 14 € à 60 % dont 1,08 € sont réintégrés, un taux de 70 % qui fait tomber toute l'exonération, une addition de 32 € coupée à 25 €, un titre 2026 sur carte valable jusqu'au 28 février 2027. Le site ne se construit pas si un test échoue.</p>
+    <h2>Comment la méthode de Titres Resto est mise à jour</h2>
+    <p>Les chiffres sont relus à la main à chaque publication officielle : nouveau plafond d'exonération, vote de la loi, décret sur les plafonds journaliers. Il n'y a pas de mise à jour automatique. Si vous voyez une erreur, écrivez-nous depuis la page <a href={route('contact', lang)}>contact</a> ; la façon dont nous corrigeons est décrite dans la <a href={route('editorial', lang)}>politique éditoriale</a>. Les informations reprises de service-public.fr le sont sous Licence Ouverte 2.0.</p>
+  </article>
+</PageLayout>

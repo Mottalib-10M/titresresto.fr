@@ -1,0 +1,97 @@
+{
+  "_lisezmoi": "Tous les paramètres du site vivent ici, jamais en dur dans le code (RECETTE §4). Chaque valeur a été relue sur la source citée le jour de retrieved_at. Plafond d'exonération 2027 : non publié au 13/11/2026, donc absent (null).",
+  "year": 2026,
+  "retrieved_at": "2026-11-13",
+  "valid_from": "2026-01-01",
+  "valid_to": "2026-12-31",
+  "exoneration": {
+    "plafond": { "2026": 7.32 },
+    "plafond2027": null,
+    "tauxMin": 50,
+    "tauxMax": 60,
+    "_source": "service-public F21059 (vérifié le 08/07/2026) ; rapport Sénat n° 141, p. « régime social favorable » (7,32 € par titre en 2026, doctrine Urssaf) ; CNTR, actualité « 7,32 € à compter du 1er janvier 2026 »"
+  },
+  "usage": {
+    "plafondJour": 25,
+    "plafondJourAvant2022": 19,
+    "toutAlimentaireJusquau": "2026-12-31",
+    "_source": "service-public F21059 ; rapport Sénat n° 141 (R. 3262-10, décret n° 2022-1266 du 29 septembre 2022)"
+  },
+  "validite": {
+    "moisApresDemat": 2,
+    "moisApresPapier": 1,
+    "joursEchange": 15,
+    "_source": "rapport Sénat n° 141 (article R. 3262-5 du code du travail) : fin février N+1 en dématérialisé, fin janvier N+1 en papier, échange jusqu'au 15 mars ou au 15 février"
+  },
+  "marche": {
+    "beneficiairesMillions": 6,
+    "marcheMilliards": 11,
+    "partDemat2024": 80,
+    "contreValeurPerimes2024Millions": 54.6,
+    "commissionAcceptationMoyenne": 4,
+    "valeurFacialeMoyenne2024": 8.94,
+    "employeurs": 235000,
+    "_source": "rapport Sénat n° 141, exposé général et article 2 (données CNTR)"
+  },
+  "ppl": {
+    "numeroAN": 2892,
+    "depotAN": "2026-06-09",
+    "adoptionAN": "2026-10-12",
+    "texteAN": 352,
+    "transmisSenat": "2026-10-13",
+    "texteSenat": 32,
+    "rapport": 141,
+    "texteCommission": 142,
+    "commission": "2026-11-03",
+    "seanceSenat": "2026-11-19",
+    "promulguee": false,
+    "entreeVigueur": "2028-01-01",
+    "toutAlimentaire2027": "2027-01-01",
+    "interdictionRemises": "2027-01-01",
+    "rapportGouvernementCommissions": "2028-07-01"
+  },
+  "sources": {
+    "sp": {
+      "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/F21059",
+      "label": {
+        "fr": "Service-public.fr : « Comment obtenir et utiliser des titres-restaurant ? » (vérifié le 8 juillet 2026)",
+        "en": "Service-public.fr: how to obtain and use meal vouchers (checked 8 July 2026, in French)"
+      }
+    },
+    "dossier": {
+      "url": "https://www.senat.fr/dossier-legislatif/ppl26-032.html",
+      "label": {
+        "fr": "Sénat : dossier législatif « Moderniser et rééquilibrer le fonctionnement du titre-restaurant »",
+        "en": "French Senate: legislative file of the meal-voucher bill (in French)"
+      }
+    },
+    "texteAN": {
+      "url": "https://www.senat.fr/leg/ppl26-032.html",
+      "label": {
+        "fr": "Sénat, texte n° 32 (2026-2027) : proposition de loi adoptée par l'Assemblée nationale le 12 octobre 2026",
+        "en": "Senate text no. 32 (2026-2027): the bill as passed by the National Assembly on 12 October 2026 (in French)"
+      }
+    },
+    "texteCommission": {
+      "url": "https://www.senat.fr/leg/ppl26-142.html",
+      "label": {
+        "fr": "Sénat, texte n° 142 (2026-2027) : texte de la commission des affaires sociales du 3 novembre 2026",
+        "en": "Senate text no. 142 (2026-2027): the Social Affairs Committee version of 3 November 2026 (in French)"
+      }
+    },
+    "rapport": {
+      "url": "https://www.senat.fr/rap/l26-141/l26-141.html",
+      "label": {
+        "fr": "Sénat, rapport n° 141 (2026-2027) de Mme Frédérique Puissat sur la proposition de loi",
+        "en": "Senate report no. 141 (2026-2027) by Frédérique Puissat on the bill (in French)"
+      }
+    },
+    "cntr": {
+      "url": "https://www.cntr.fr/",
+      "label": {
+        "fr": "Commission nationale des titres-restaurant (CNTR)",
+        "en": "National meal-voucher commission (CNTR, in French)"
+      }
+    }
+  }
+}

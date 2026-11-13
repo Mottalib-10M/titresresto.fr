@@ -1,0 +1,21 @@
+{
+ "name": "Titres Resto",
+ "short_name": "Titres Resto",
+ "description": "Titres-restaurant 2026 et 2027 : part employeur exonérée (7,32 €), plafond de 25 € par jour, dimanche, supermarché, validité et réforme en cours au Sénat.",
+ "start_url": "/fr/",
+ "display": "standalone",
+ "background_color": "#ffffff",
+ "theme_color": "#A33A1C",
+ "icons": [
+  {
+   "src": "/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ]
+}

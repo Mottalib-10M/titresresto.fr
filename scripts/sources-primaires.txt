@@ -1,0 +1,4 @@
+# Sénat : dossier législatif, textes et rapport de la proposition de loi sur le titre-restaurant (texte AN n° 352, Sénat n° 32 et 142, rapport n° 141).
+senat.fr
+# Commission nationale des titres-restaurant, organisme public placé auprès des ministères (agréments, plafond d'exonération publié).
+cntr.fr

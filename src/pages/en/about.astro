@@ -1,0 +1,29 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { route } from '../../i18n/routes';
+import { AUTHOR_NAME, AUTHOR_DESC, CONTACT_EMAIL } from '../../data/site-config';
+import { srcLink } from '../../lib/helpers';
+import { profilePageSchema, breadcrumbSchema } from '../../lib/seo';
+const lang = 'en';
+const path = route('about', lang);
+const title = 'Titres Resto: independent meal voucher publisher, 2026';
+const description = 'Titres Resto is published by Radif Partners: free French meal voucher simulators built on official 2026 texts. Not a voucher issuer and not a public body.';
+const s = (k: string, t: string) => srcLink(k, lang, t);
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[profilePageSchema({ path, lang }), breadcrumbSchema([{ name: 'Home', path: route('home', lang) }, { name: 'About', path }])]} breadcrumbs={[{ label: 'About' }]}>
+  <article class="prose prose-slate max-w-none">
+    <h1>About Titres Resto</h1>
+    <p>{AUTHOR_DESC.en}</p>
+    <div class="not-prose text-xs font-medium uppercase tracking-wide text-navy-500">Independent site: not a voucher issuer or a public body</div>
+    <h2>Why this site exists</h2>
+    <p>Meal voucher rules are simple one at a time, but they interlock: the 50 to 60% band, the exemption cap per voucher, the daily spending limit, working days, voucher years, and now a bill in two versions. Issuer pages mostly talk about their cards; press articles give dates without sources. Here each rule becomes a calculation, with the text alongside, and anything not yet voted is shown as an assumption.</p>
+    <h2>A company, not a public body</h2>
+    <p>{AUTHOR_NAME} is a company that builds calculators from public texts. It is not a meal voucher issuer, an employer or a consultancy. The site uses no logo of any public body or issuer, sells nothing, has no affiliate links and collects no contact details.</p>
+    <LegalIdentity lang={lang} />
+    <h2>Sources</h2>
+    <p>Figures come from the <Fragment set:html={s('sp', 'service-public.fr guidance')} />, the <Fragment set:html={s('cntr', 'CNTR')} /> and the Senate texts on the bill, including the <Fragment set:html={s('rapport', 'Social Affairs Committee report')} />. The <a href={route('method', lang)}>method</a> explains how they are applied and the <a href={route('editorial', lang)}>editorial policy</a> how they are corrected.</p>
+    <h2>Write to us</h2>
+    <p><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>, if a figure looks misread or a simulator handles a case badly. For your card or balance, contact your employer or your issuer.</p>
+  </article>
+</PageLayout>

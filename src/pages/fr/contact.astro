@@ -1,0 +1,20 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { CONTACT_EMAIL, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { contactPageSchema } from '../../lib/seo';
+const lang = 'fr';
+const description = 'Écrivez-nous si un chiffre, un plafond ou une date sur les titres-restaurant semble mal lu, ou pour intégrer un simulateur. Nous ne gérons ni cartes ni soldes.';
+---
+<PageLayout title={`Contact de ${SITE_NAMES[lang]} : signaler une erreur`} description={description} lang={lang} noindex={true} jsonLd={[contactPageSchema({ name: 'Contact', description, path: route('contact', lang), lang })]} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Contact</h1>
+    <p>Courriel : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>Une erreur dans un chiffre ou un cas mal traité</h2>
+    <p>Indiquez la page, ce que vous avez tapé et ce que vous attendiez, et si possible le texte qui le justifie. Nous vérifions à la source avant de changer quoi que ce soit.</p>
+    <h2>Votre carte ou votre solde</h2>
+    <p>Ce site n'est ni un émetteur de titres-restaurant ni votre employeur : nous ne voyons aucune carte et ne pouvons rien débloquer. Pour un solde, une carte refusée ou un remboursement, adressez-vous à votre service des ressources humaines ou à l'émetteur de votre carte. Ne nous envoyez ni bulletin de paie ni numéro de carte.</p>
+    <h2>Intégrer un simulateur</h2>
+    <p>Comités sociaux et économiques, services RH et associations peuvent l'intégrer gratuitement : <a href={route('widget', lang)}>mode d'emploi</a>.</p>
+  </div>
+</PageLayout>

@@ -1,0 +1,20 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { CONTACT_EMAIL, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { contactPageSchema } from '../../lib/seo';
+const lang = 'en';
+const description = 'Write to us if a meal voucher figure, limit or date looks misread, or to embed a simulator. We do not manage cards or balances and cannot see any voucher account.';
+---
+<PageLayout title={`Contact ${SITE_NAMES[lang]}: report an error on the site`} description={description} lang={lang} noindex={true} jsonLd={[contactPageSchema({ name: 'Contact', description, path: route('contact', lang), lang })]} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Contact</h1>
+    <p>Email: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>An error in a figure or a case handled badly</h2>
+    <p>Tell us the page, what you entered and what you expected, and if possible the text that supports it. We check the source before changing anything.</p>
+    <h2>Your card or balance</h2>
+    <p>This site is neither a meal voucher issuer nor your employer: we see no cards and cannot unblock anything. For a balance, a refused card or a refund, contact your HR department or the company that issued your card. Please do not send us payslips or card numbers.</p>
+    <h2>Embedding a simulator</h2>
+    <p>Works councils, HR departments and associations can embed it free of charge: <a href={route('widget', lang)}>instructions</a>.</p>
+  </div>
+</PageLayout>

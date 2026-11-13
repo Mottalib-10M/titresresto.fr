@@ -1,0 +1,28 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, REVIEW_CYCLE_MONTHS, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { displayDate } from '../../lib/format';
+const lang = 'fr';
+---
+<PageLayout title={`Politique éditoriale de ${SITE_NAMES[lang]} : sources et erreurs`} description="Quels textes utilise Titres Resto, dans quel ordre ils font foi, comment les simulateurs sont testés, à quel rythme ils sont revus et comment une erreur de chiffre est corrigée." lang={lang} noindex={true} breadcrumbs={[{ label: 'Politique éditoriale' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Politique éditoriale</h1>
+    <p>Un plafond mal recopié peut faire perdre de l'argent à un salarié ou des cotisations à une entreprise. Cette page dit d'où vient chaque donnée et ce qui se passe quand nous nous trompons.</p>
+    <h2>Responsable</h2><p>{AUTHOR_NAME} répond du contenu et des simulateurs. Contact : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>Sources, par ordre</h2>
+    <ol>
+      <li><strong>Les textes</strong> : code du travail, lois et décrets, et pour la réforme les textes adoptés publiés par le Sénat ;</li>
+      <li><strong>Les pages officielles</strong> : service-public.fr et la Commission nationale des titres-restaurant ;</li>
+      <li><strong>Les rapports parlementaires</strong>, pour les données de marché et l'explication des mesures.</li>
+    </ol>
+    <p>Nous ne reprenons ni chiffre ni date de la presse, des émetteurs ou des forums. Une valeur que nous n'avons pas relue à la source ne s'affiche pas.</p>
+    <h2>Révision</h2>
+    <p>Chaque chiffre est dans un fichier unique, avec sa source et sa date de lecture ; les pages et les simulateurs le lisent de là. Révision complète au moins tous les {REVIEW_CYCLE_MONTHS} mois et à chaque nouveau texte. Dernière révision : {displayDate(LAST_UPDATED, 'fr-FR')}.</p>
+    <h2>Corrections</h2>
+    <p>Chaque signalement est vérifié à la source. En cas d'erreur, le chiffre est corrigé dans son fichier, un cas de test est ajouté et la date de mise à jour change.</p>
+    <h2>Indépendance</h2>
+    <p>Ce site n'est ni un émetteur de titres-restaurant ni une administration. Il ne vend rien, ne collecte aucune coordonnée et n'a aucun accord avec un émetteur ou une enseigne.</p>
+    <p>Voir aussi <a href={route('about', lang)}>à propos</a> et la <a href={route('method', lang)}>méthode</a>.</p>
+  </div>
+</PageLayout>

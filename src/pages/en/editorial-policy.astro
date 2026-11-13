@@ -1,0 +1,28 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, REVIEW_CYCLE_MONTHS, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { displayDate } from '../../lib/format';
+const lang = 'en';
+---
+<PageLayout title={`Editorial policy of ${SITE_NAMES[lang]}: sources and errors`} description="Which texts Titres Resto uses, in what order they prevail, how the simulators are tested, how often they are reviewed and how an error in a meal voucher figure is corrected." lang={lang} noindex={true} breadcrumbs={[{ label: 'Editorial policy' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Editorial policy</h1>
+    <p>A misquoted limit can cost an employee money or a company contributions. This page says where each figure comes from and what happens when we get it wrong.</p>
+    <h2>Responsibility</h2><p>{AUTHOR_NAME} is responsible for the content and the simulators. Contact: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>Sources, in order</h2>
+    <ol>
+      <li><strong>The texts</strong>: the Labour Code, laws and decrees, and for the reform the adopted texts published by the Senate;</li>
+      <li><strong>Official pages</strong>: service-public.fr and the National Meal Voucher Commission;</li>
+      <li><strong>Parliamentary reports</strong>, for market data and the reasons behind each measure.</li>
+    </ol>
+    <p>We take no figure or date from the press, issuers or forums. A value we have not re-read at source is not shown.</p>
+    <h2>Review</h2>
+    <p>Each figure sits in a single file with its source and reading date; pages and simulators read it from there. Full review at least every {REVIEW_CYCLE_MONTHS} months and at each new text. Last review: {displayDate(LAST_UPDATED, 'en-GB')}.</p>
+    <h2>Corrections</h2>
+    <p>Every report is checked at source. If there is an error, the figure is corrected in its file, a test case is added and the update date changes.</p>
+    <h2>Independence</h2>
+    <p>This site is neither a meal voucher issuer nor a public body. It sells nothing, collects no contact details and has no agreement with any issuer or retailer.</p>
+    <p>See also <a href={route('about', lang)}>about</a> and the <a href={route('method', lang)}>method</a>.</p>
+  </div>
+</PageLayout>
