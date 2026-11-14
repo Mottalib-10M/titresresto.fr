@@ -302,6 +302,222 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
       };
     },
   }),
+  /* Ticket restaurant : une année de titres. */
+  annuel: (l, a) => ({
+    inputs: [
+      { id: 'joursSemaine', label: T(l, 'Jours travaillés par semaine avec un repas', 'Working days a week that include a meal'), def: Number(A(a, 'joursSemaine', 5)), max: 7 },
+      { id: 'semaines', label: T(l, 'Semaines travaillées dans l\'année', 'Weeks worked in the year'), def: Number(A(a, 'semaines', 47)), max: 52, help: T(l, '52 semaines moins les congés et les jours fériés.', '52 weeks minus leave and public holidays.') },
+      VALEUR(l, Number(A(a, 'valeur', 10))), { ...TAUX(l, Number(A(a, 'taux', 50))), adv: true },
+    ],
+    run: (v) => {
+      const r = E.annuel(n(v, 'joursSemaine'), n(v, 'semaines'), n(v, 'valeur'), n(v, 'taux'));
+      return {
+        label: T(l, 'Ce que l\'employeur vous verse sur un an', 'What your employer pays you over a year'),
+        value: eur0(r.employeur, l),
+        hyp: T(l, `${int(r.n, l)} titres de ${eur(n(v, 'valeur'), l)} dans l'année, employeur à ${pct(n(v, 'taux'), l)}.`, `${int(r.n, l)} vouchers of ${eur(n(v, 'valeur'), l)} in the year, employer at ${pct(n(v, 'taux'), l)}.`),
+        sub: r.reintegre > 0 ? T(l, `Dont ${eur0(r.reintegre, l)} au-delà de ${eur(PL, l)} par titre, soumis aux cotisations.`, `Of which ${eur0(r.reintegre, l)} above ${eur(PL, l)} per voucher, subject to contributions.`) : r.exonere > 0 ? T(l, 'Sans cotisations ni impôt sur le revenu.', 'Free of contributions and income tax.') : T(l, `Taux hors de ${TAUX_TXT(l)} : aucune exonération.`, `Rate outside ${TAUX_TXT(l)}: no exemption.`),
+        rows: [
+          [T(l, 'Titres reçus dans l\'année', 'Vouchers received in the year'), int(r.n, l)],
+          [T(l, 'Crédités au total', 'Credited in total'), eur0(r.credite, l)],
+          [T(l, 'Retenus sur vos salaires', 'Deducted from your pay'), eur0(r.retenue, l)],
+          [T(l, 'Moyenne par mois', 'Average per month'), T(l, `${formatDecimal(r.parMois, 1, l)} titres`, `${formatDecimal(r.parMois, 1, l)} vouchers`)],
+        ],
+      };
+    },
+  }),
+  /* Chèque restaurant papier : combien de chèques donner, ce que l'on perd sans rendu de monnaie. */
+  papier: (l, a) => ({
+    inputs: [
+      { id: 'addition', label: T(l, 'Montant de l\'addition', 'Bill amount'), def: Number(A(a, 'addition', 23.5)), unit: '€', decimals: 2, max: 500 },
+      VALEUR(l, Number(A(a, 'valeur', 9))),
+    ],
+    run: (v) => {
+      const r = E.papier(n(v, 'addition'), n(v, 'valeur'));
+      return {
+        label: T(l, 'Chèques à donner sans rien perdre', 'Vouchers to hand over without losing anything'),
+        value: int(r.bas, l),
+        hyp: T(l, `Addition de ${eur(n(v, 'addition'), l)}, chèques de ${eur(n(v, 'valeur'), l)}, jour de semaine.`, `A ${eur(n(v, 'addition'), l)} bill, ${eur(n(v, 'valeur'), l)} vouchers, on a weekday.`),
+        sub: r.complement > 0 ? T(l, `Complément à payer autrement : ${eur(r.complement, l)}.`, `Top-up to pay another way: ${eur(r.complement, l)}.`) : T(l, 'Le compte est juste.', 'It adds up exactly.'),
+        rows: [
+          [T(l, 'Avec un chèque de plus', 'With one more voucher'), r.hautOk && r.perte > 0 ? T(l, `${int(r.haut, l)} chèques, ${eur(r.perte, l)} perdus`, `${int(r.haut, l)} vouchers, ${eur(r.perte, l)} lost`) : r.hautOk ? T(l, 'inutile', 'not needed') : T(l, `impossible : plafond de ${eur(E.PLAFOND_JOUR, l)}`, `not allowed: ${eur(E.PLAFOND_JOUR, l)} limit`)],
+          [T(l, 'Chèques au plus ce jour-là', 'Most vouchers that day'), int(r.plafondTitres, l)],
+          [T(l, 'Avec une carte : débité', 'With a card: debited'), eur(r.carteTitres, l)],
+          [T(l, 'Avec une carte : reste à payer', 'With a card: left to pay'), eur(r.carteReste, l)],
+        ],
+        note: T(l, 'Sur papier, le commerçant ne rend pas la monnaie ; une carte débite le montant exact.', 'With paper, the shop gives no change; a card debits the exact amount.'),
+      };
+    },
+  }),
+  /* Ticket repas : coût réel du déjeuner une fois la part employeur déduite. */
+  repas: (l, a) => ({
+    inputs: [
+      { id: 'prix', label: T(l, 'Prix de votre déjeuner', 'Price of your lunch'), def: Number(A(a, 'prix', 14)), unit: '€', decimals: 2, max: 200 },
+      VALEUR(l, Number(A(a, 'valeur', 10))), TAUX(l, Number(A(a, 'taux', 50))),
+      { id: 'repasMois', label: T(l, 'Déjeuners par mois', 'Lunches a month'), def: Number(A(a, 'repasMois', 20)), max: 31, adv: true },
+    ],
+    run: (v) => {
+      const r = E.dejeuner(n(v, 'prix'), n(v, 'valeur'), n(v, 'taux'), n(v, 'repasMois'));
+      return {
+        label: T(l, 'Ce que vous coûte vraiment ce déjeuner', 'What this lunch really costs you'),
+        value: eur(r.coutReel, l),
+        hyp: T(l, `Déjeuner de ${eur(n(v, 'prix'), l)}, titre de ${eur(n(v, 'valeur'), l)} payé à ${pct(n(v, 'taux'), l)} par l'employeur.`, `A ${eur(n(v, 'prix'), l)} lunch, ${eur(n(v, 'valeur'), l)} voucher, ${pct(n(v, 'taux'), l)} paid by the employer.`),
+        sub: T(l, `L'employeur paie ${formatDecimal(r.couvert, 0, l)} % du repas.\nSur un mois : ${eur0(r.coutReelMois, l)} de votre poche.`, `Your employer pays ${formatDecimal(r.couvert, 0, l)}% of the meal.\nOver a month: ${eur0(r.coutReelMois, l)} out of your pocket.`),
+        rows: [
+          [T(l, 'Payé avec le titre', 'Paid with the voucher'), eur(r.enTitres, l)],
+          [T(l, 'Complément en caisse', 'Top-up at the till'), eur(r.complement, l)],
+          [T(l, 'Part de l\'employeur sur le mois', 'Employer share over the month'), eur0(r.employeurMois, l)],
+        ],
+        note: T(l, 'Calcul avec un titre par déjeuner ; la part que vous payez vous-même est retenue sur la paie.', 'Worked out with one voucher per lunch; the part you pay yourself is deducted from your pay.'),
+      };
+    },
+  }),
+  /* Titres restaurant : en combien de jours écouler un solde. */
+  solde: (l, a) => ({
+    inputs: [
+      { id: 'solde', label: T(l, 'Solde de votre carte', 'Your card balance'), def: Number(A(a, 'solde', 180)), unit: '€', decimals: 2, max: 5000 },
+      { id: 'depense', label: T(l, 'Dépense par jour d\'utilisation', 'Spending per day of use'), def: Number(A(a, 'depense', 12)), unit: '€', decimals: 2, max: 100, help: T(l, `Au-delà de ${eur(E.PLAFOND_JOUR, l)}, le calcul garde le plafond.`, `Above ${eur(E.PLAFOND_JOUR, l)}, the calculation keeps the limit.`) },
+      { id: 'joursSemaine', label: T(l, 'Jours d\'utilisation par semaine', 'Days of use a week'), def: Number(A(a, 'joursSemaine', 5)), max: 6, adv: true },
+    ],
+    run: (v) => {
+      const r = E.ecouler(n(v, 'solde'), n(v, 'depense'), n(v, 'joursSemaine'));
+      return {
+        label: T(l, 'Jours d\'utilisation pour tout dépenser', 'Days of use to spend it all'),
+        value: int(r.jours, l),
+        hyp: T(l, `Solde de ${eur(n(v, 'solde'), l)}, ${eur(r.rythme, l)} par jour.`, `A ${eur(n(v, 'solde'), l)} balance, ${eur(r.rythme, l)} a day.`),
+        sub: T(l, `Soit environ ${int(r.semaines, l)} semaines.\nAu plafond de ${eur(E.PLAFOND_JOUR, l)} : ${int(r.joursAuPlafond, l)} jours au moins.`, `About ${int(r.semaines, l)} weeks.\nAt the ${eur(E.PLAFOND_JOUR, l)} limit: ${int(r.joursAuPlafond, l)} days at least.`),
+        rows: [
+          [T(l, 'Rythme retenu', 'Pace used'), eur(r.rythme, l)],
+          [T(l, 'Semaines nécessaires', 'Weeks needed'), int(r.semaines, l)],
+          [T(l, 'Minimum au plafond', 'Minimum at the limit'), T(l, `${int(r.joursAuPlafond, l)} jours`, `${int(r.joursAuPlafond, l)} days`)],
+        ],
+        note: T(l, 'Le dimanche et les jours fériés ne comptent que si vous travaillez et que l\'employeur l\'a prévu.', 'Sundays and public holidays only count if you work and your employer allows it.'),
+      };
+    },
+  }),
+  /* Carte ticket restaurant refusée : la règle qui bloque. */
+  refus: (l, a) => ({
+    inputs: [
+      { id: 'montant', label: T(l, 'Montant à payer', 'Amount to pay'), def: Number(A(a, 'montant', 18)), unit: '€', decimals: 2, max: 500 },
+      { id: 'dejaPaye', label: T(l, 'Déjà payé en titres aujourd\'hui', 'Already paid with vouchers today'), def: Number(A(a, 'dejaPaye', 12)), unit: '€', decimals: 2, max: 100 },
+      { kind: 'select', id: 'zone', label: T(l, 'Le commerce est situé', 'The shop is located'), def: String(A(a, 'zone', 'meme')), options: [{ value: 'meme', label: T(l, 'Mon département de travail', 'My work département') }, { value: 'limitrophe', label: T(l, 'Département voisin', 'Neighbouring one') }, { value: 'autre', label: T(l, 'Plus loin', 'Further away') }] },
+      { kind: 'choice', id: 'jour', label: T(l, 'Jour', 'Day'), def: String(A(a, 'jour', 'semaine')), options: jourOpts(l) },
+      { kind: 'choice', id: 'travaille', label: T(l, 'Vous travaillez ce jour-là ?', 'Are you working that day?'), def: 'non', options: yn(l), when: (v) => s(v, 'jour') === 'dimanche' },
+      { kind: 'choice', id: 'autorise', label: T(l, 'L\'employeur l\'a prévu ?', 'Has the employer allowed it?'), def: 'non', options: yn(l), when: (v) => s(v, 'jour') === 'dimanche' },
+      { kind: 'select', id: 'produit', label: T(l, 'Ce que vous achetez', 'What you are buying'), def: String(A(a, 'produit', 'repas')), options: produitOpts(l), adv: true },
+      { id: 'solde', label: T(l, 'Solde de la carte', 'Card balance'), def: Number(A(a, 'solde', 60)), unit: '€', decimals: 2, max: 5000, adv: true },
+      { kind: 'choice', id: 'deplacement', label: T(l, 'Titres prévus pour un déplacement ?', 'Vouchers set up for a business trip?'), def: 'non', options: yn(l), adv: true, when: (v) => s(v, 'zone') === 'autre' },
+    ],
+    run: (v) => {
+      const r = E.diagnostic({ jour: (s(v, 'jour') || 'semaine') as E.Jour, travailleCeJour: s(v, 'travaille') === 'oui', autorise: s(v, 'autorise') === 'oui', produit: (s(v, 'produit') || 'repas') as E.Produit, montant: n(v, 'montant'), dejaPaye: n(v, 'dejaPaye'), solde: n(v, 'solde'), zone: (s(v, 'zone') || 'meme') as E.Zone, deplacement: s(v, 'deplacement') === 'oui' });
+      const why: Record<string, string> = {
+        ok: T(l, 'Aucune règle ne bloque ce paiement.', 'No rule blocks this payment.'),
+        zone: T(l, 'Hors du département de travail et des départements voisins, la carte ne passe pas.', 'Outside your work département and the neighbouring ones, the card does not work.'),
+        plafond: T(l, `Le plafond de ${eur(E.PLAFOND_JOUR, l)} par jour est atteint ou presque.`, `The ${eur(E.PLAFOND_JOUR, l)} daily limit is reached or nearly.`),
+        solde: T(l, 'Le solde de la carte ne couvre pas tout.', 'The card balance does not cover it all.'),
+        dimanche: motifTxt('dimanche', l), produit: motifTxt('produit', l), alcool: motifTxt('alcool', l), courses: motifTxt('courses', l),
+      };
+      return {
+        label: r.ok ? T(l, 'Payable avec la carte', 'Payable with the card') : T(l, 'Paiement refusé', 'Payment refused'),
+        value: eur(r.passe, l),
+        hyp: why[r.motif],
+        sub: T(l, `Reste à payer autrement : ${eur(Math.max(0, n(v, 'montant') - r.passe), l)}.`, `Left to pay another way: ${eur(Math.max(0, n(v, 'montant') - r.passe), l)}.`),
+        rows: [
+          [T(l, 'Encore permis aujourd\'hui', 'Still allowed today'), eur(E.cumulJour(n(v, 'dejaPaye'), 0).resteDuJour, l)],
+          [T(l, 'Montant demandé', 'Amount asked'), eur(n(v, 'montant'), l)],
+        ],
+        note: T(l, 'Un commerçant peut aussi ne pas accepter les titres, ou limiter la liste des produits : c\'est son choix.', 'A shop may also not take vouchers at all, or limit the products: that is its choice.'),
+      };
+    },
+  }),
+  /* Carte Edenred : écouler l'ancien millésime avant fin février. */
+  millesime: (l, a) => ({
+    inputs: [
+      { id: 'solde', label: T(l, 'Solde 2026 restant sur la carte', '2026 balance left on the card'), def: Number(A(a, 'solde', 140)), unit: '€', decimals: 2, max: 5000 },
+      { kind: 'select', id: 'depuis', label: T(l, 'À partir du', 'Starting from'), def: String(A(a, 'depuis', '2027-01-04')), options: [{ value: '2026-12-01', label: T(l, '1er décembre 2026', '1 December 2026') }, { value: '2027-01-04', label: T(l, '4 janvier 2027', '4 January 2027') }, { value: '2027-02-01', label: T(l, '1er février 2027', '1 February 2027') }, { value: '2027-02-15', label: T(l, '15 février 2027', '15 February 2027') }] },
+      { id: 'depense', label: T(l, 'Dépense par jour d\'utilisation', 'Spending per day of use'), def: Number(A(a, 'depense', 10)), unit: '€', decimals: 2, max: 100 },
+      { id: 'joursSemaine', label: T(l, 'Jours d\'utilisation par semaine', 'Days of use a week'), def: 5, max: 6, adv: true },
+    ],
+    run: (v) => {
+      const r = E.ancienSolde(n(v, 'solde'), s(v, 'depuis'), n(v, 'depense'), n(v, 'joursSemaine'));
+      return {
+        label: r.ok ? T(l, 'Solde écoulé à temps', 'Balance spent in time') : T(l, 'Reste au dernier jour', 'Left on the last day'),
+        value: r.ok ? T(l, 'Oui', 'Yes') : eur(r.reste, l),
+        hyp: T(l, `${int(r.joursUsage, l)} jours d'utilisation jusqu'au ${day(r.dernierJour, l)}, à ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} par jour.`, `${int(r.joursUsage, l)} days of use until ${day(r.dernierJour, l)}, at ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} a day.`),
+        sub: r.ok ? T(l, 'Les titres 2027 ne servent qu\'une fois le solde 2026 épuisé.', '2027 vouchers are only used once the 2026 balance is gone.') : T(l, `Il faudrait ${eur(r.rythmeNecessaire, l)} par jour.\nSinon, échange possible jusqu'au ${day(r.finEchange, l)}.`, `You would need ${eur(r.rythmeNecessaire, l)} a day.\nOtherwise, exchange possible until ${day(r.finEchange, l)}.`),
+        rows: [
+          [T(l, 'Dernier jour des titres 2026 sur carte', 'Last day for 2026 card vouchers'), day(r.dernierJour, l)],
+          [T(l, 'Capacité de dépense d\'ici là', 'Spending room until then'), eur(r.capacite, l)],
+          [T(l, 'Fin de l\'échange', 'End of exchange'), day(r.finEchange, l)],
+        ],
+      };
+    },
+  }),
+  /* Swile : plusieurs paiements le même jour. */
+  cumul: (l, a) => ({
+    inputs: [
+      { id: 'dejaPaye', label: T(l, 'Déjà payé en titres aujourd\'hui', 'Already paid with vouchers today'), def: Number(A(a, 'dejaPaye', 9.5)), unit: '€', decimals: 2, max: 100 },
+      { id: 'achat', label: T(l, 'Nouvel achat', 'New purchase'), def: Number(A(a, 'achat', 21)), unit: '€', decimals: 2, max: 500 },
+    ],
+    run: (v) => {
+      const r = E.cumulJour(n(v, 'dejaPaye'), n(v, 'achat'));
+      return {
+        label: T(l, 'Ce qui passe encore en titres', 'What still goes on vouchers'),
+        value: eur(r.passe, l),
+        hyp: T(l, `${eur(Math.max(0, n(v, 'dejaPaye')), l)} déjà dépensés sur ${eur(E.PLAFOND_JOUR, l)} permis aujourd'hui.`, `${eur(Math.max(0, n(v, 'dejaPaye')), l)} already spent out of ${eur(E.PLAFOND_JOUR, l)} allowed today.`),
+        sub: r.complement > 0 ? T(l, `À payer avec une autre carte : ${eur(r.complement, l)}.\nAnnoncez le montant en titres avant de payer.`, `To pay with another card: ${eur(r.complement, l)}.\nSay the voucher amount before paying.`) : T(l, 'Tout passe en titres.', 'All of it goes on vouchers.'),
+        rows: [
+          [T(l, 'Encore permis aujourd\'hui', 'Still allowed today'), eur(r.resteDuJour, l)],
+          [T(l, 'Complément', 'Top-up'), eur(r.complement, l)],
+        ],
+        note: T(l, 'Le compteur repart de zéro le lendemain ; le plafond ne se reporte pas.', 'The counter resets the next day; the limit does not roll over.'),
+      };
+    },
+  }),
+  /* Up Déjeuner : un mois en papier contre la carte. */
+  carnet: (l, a) => ({
+    inputs: [
+      { id: 'addition', label: T(l, 'Déjeuner habituel', 'Usual lunch'), def: Number(A(a, 'addition', 12.4)), unit: '€', decimals: 2, max: 200 },
+      VALEUR(l, Number(A(a, 'valeur', 8))),
+      { id: 'repasMois', label: T(l, 'Déjeuners par mois', 'Lunches a month'), def: Number(A(a, 'repasMois', 18)), max: 31 },
+    ],
+    run: (v) => {
+      const r = E.carnet(n(v, 'addition'), n(v, 'valeur'), n(v, 'repasMois'));
+      return {
+        label: T(l, 'Monnaie perdue sur un mois en papier', 'Change lost over a month on paper'),
+        value: eur0(r.perteMois, l),
+        hyp: T(l, `${int(n(v, 'repasMois'), l)} déjeuners de ${eur(n(v, 'addition'), l)}, titres papier de ${eur(n(v, 'valeur'), l)} arrondis au titre supérieur.`, `${int(n(v, 'repasMois'), l)} lunches of ${eur(n(v, 'addition'), l)}, ${eur(n(v, 'valeur'), l)} paper vouchers rounded up.`),
+        sub: T(l, `Avec la carte : 0 € perdu.\nSans arrondir : ${eur0(r.complementMois, l)} à compléter dans le mois.`, `With the card: nothing lost.\nWithout rounding up: ${eur0(r.complementMois, l)} to top up over the month.`),
+        rows: [
+          [T(l, 'Titres par déjeuner en arrondissant', 'Vouchers per lunch, rounding up'), r.hautOk ? int(r.haut, l) : T(l, 'au-delà du plafond', 'above the limit')],
+          [T(l, 'Perte par déjeuner', 'Loss per lunch'), eur(r.perte, l)],
+          [T(l, 'Complément par déjeuner sans arrondir', 'Top-up per lunch without rounding'), eur(r.complement, l)],
+        ],
+      };
+    },
+  }),
+  /* Bimpli commerçant : ce que coûte l'acceptation des titres. */
+  commission: (l, a) => ({
+    inputs: [
+      { id: 'montant', label: T(l, 'Encaissé en titres par mois', 'Taken in vouchers a month'), def: Number(A(a, 'montant', 3000)), unit: '€', max: 1000000 },
+      { id: 'taux', label: T(l, 'Commission de l\'émetteur', 'Issuer commission'), def: Number(A(a, 'taux', P.marche.commissionAcceptationMoyenne)), unit: '%', decimals: 2, max: 20, help: T(l, `${pct(P.marche.commissionAcceptationMoyenne, l)} en moyenne selon le Sénat ; le vôtre est dans votre contrat.`, `${pct(P.marche.commissionAcceptationMoyenne, l)} on average according to the Senate; yours is in your contract.`) },
+      { id: 'fixe', label: T(l, 'Frais fixes par paiement', 'Fixed fee per payment'), def: 0, unit: '€', decimals: 2, max: 5, adv: true },
+      { id: 'paiements', label: T(l, 'Paiements en titres par mois', 'Voucher payments a month'), def: 250, max: 100000, adv: true },
+    ],
+    run: (v) => {
+      const r = E.commission(n(v, 'montant'), n(v, 'taux'), n(v, 'fixe'), n(v, 'paiements'));
+      return {
+        label: T(l, 'Coût des titres pour le commerce, par mois', 'Cost of vouchers to the shop, per month'),
+        value: eur0(r.mois, l),
+        hyp: T(l, `${eur0(n(v, 'montant'), l)} encaissés en titres, commission de ${pct(n(v, 'taux'), l)}.`, `${eur0(n(v, 'montant'), l)} taken in vouchers, ${pct(n(v, 'taux'), l)} commission.`),
+        sub: T(l, `Sur un an : ${eur0(r.an, l)}.\nTaux réel : ${pct(r.tauxEffectif, l)} du montant.`, `Over a year: ${eur0(r.an, l)}.\nActual rate: ${pct(r.tauxEffectif, l)} of the amount.`),
+        rows: [
+          [T(l, 'Reversé au commerce', 'Paid to the shop'), eur0(r.net, l)],
+          [T(l, 'Coût annuel', 'Yearly cost'), eur0(r.an, l)],
+        ],
+        note: T(l, 'Chaque émetteur fixe ses conditions dans son contrat d\'affiliation ; ce calcul ne les remplace pas.', 'Each issuer sets its terms in its affiliation contract; this calculation does not replace them.'),
+      };
+    },
+  }),
 };
 
 export const TOOL_KINDS = Object.keys(SPECS);

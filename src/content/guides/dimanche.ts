@@ -24,9 +24,9 @@ export default defineGuide({
   fr: {
     slug: 'dimanche-jours-feries',
     nav: 'Dimanche et jours fériés', card: 'Pourquoi la carte est refusée le dimanche, et ce que la réforme changerait en 2028',
-    title: 'Titre-restaurant le dimanche 2026 : qui peut payer avec ?',
+    title: 'Ticket restaurant dimanche 2026 : qui peut payer avec ?',
     description: 'Titre-restaurant le dimanche et les jours fériés en 2026 : réservé aux salariés qui travaillent ce jour-là, si l\'employeur l\'a prévu. Et après la réforme.',
-    h1: 'Titre-restaurant le dimanche et les jours fériés : la règle en 2026',
+    h1: 'Ticket restaurant dimanche et jours fériés : la règle en 2026',
     intro: 'Dites si vous travaillez ce dimanche, si l\'employeur l\'a prévu et l\'année : le simulateur dit si votre titre-restaurant passe le dimanche ou un jour férié, selon la règle actuelle et les deux versions de la réforme.',
     resume: `Un titre-restaurant ne s'utilise en principe que les jours ouvrables, du lundi au samedi. Le dimanche et les jours fériés, il n'est accepté que pour les salariés qui travaillent ce jour-là, et seulement si l'employeur l'a décidé à leur profit : c'est la règle de l'article R. 3262-8 du code du travail, reprise par service-public.fr. Une carte refusée un dimanche midi n'est donc pas une panne, c'est l'application de cette règle par l'émetteur. Le samedi, en revanche, est un jour ouvrable comme les autres. Le rapport du Sénat cite un émetteur selon lequel environ 20 % de ses bénéficiaires ont été autorisés par leur employeur à une utilisation le dimanche. La proposition de loi adoptée par l'Assemblée nationale le ${day(PPL.adoptionAN, 'fr')} ouvrait les titres tous les jours de la semaine à partir de 2028. La commission des affaires sociales du Sénat a supprimé cette mesure le ${day(PPL.commission, 'fr')}. Rien n'est voté : en 2026 et en 2027, la règle actuelle s'applique.`,
     faqs: [

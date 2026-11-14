@@ -7,9 +7,11 @@ const CORE: Record<Locale, Record<string, string>> = {
   en: { home: 'Meal voucher simulator', method: 'How we calculate', about: 'About', widget: 'Embed the simulator', contact: 'Contact', editorial: 'Editorial policy', privacy: 'Privacy', terms: 'Legal notice', cookies: 'Cookies' },
 };
 export const GROUPS: Array<{ id: Group; label: Record<Locale, string> }> = [
+  { id: 'essentiel', label: { fr: 'Ticket restaurant, chèque, ticket repas', en: 'Ticket restaurant, chèque, ticket repas' } },
   { id: 'argent', label: { fr: 'Part employeur et plafonds', en: 'Employer share and caps' } },
   { id: 'usage', label: { fr: 'Où et quand payer', en: 'Where and when to pay' } },
   { id: 'regles', label: { fr: 'Droits et réforme', en: 'Rights and reform' } },
+  { id: 'cartes', label: { fr: 'Cartes et émetteurs', en: 'Cards and issuers' } },
 ];
 export const label = (id: string, lang: Locale) => CORE[lang][id] ?? guideById(id)?.[lang]?.nav ?? id;
 const link = (id: string, lang: Locale): NavLink => ({ href: route(id, lang), label: label(id, lang) });
@@ -23,4 +25,4 @@ export const footerColumns = (lang: Locale): NavCategory[] => {
   return [...navCategories(lang), site];
 };
 /** Les calculateurs les plus utilisés, à un clic de chaque page (RECETTE §18.2). */
-export const popularLinks = (lang: Locale): NavLink[] => [link('home', lang), ...['exoneration', 'plafond', 'supermarche', 'validite'].filter((id) => hasRoute(id, lang)).map((id) => link(id, lang))];
+export const popularLinks = (lang: Locale): NavLink[] => [link('home', lang), ...['ticket', 'cheque', 'exoneration', 'plafond', 'supermarche', 'validite'].filter((id) => hasRoute(id, lang)).map((id) => link(id, lang))];

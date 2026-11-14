@@ -2,5 +2,6 @@
  *  Les tests acceptent un lien vers ces ids pendant la rédaction ; « chaque page prévue a son fichier » échoue tant qu'il en manque. */
 export const PLANNED_GUIDES = [
   'exoneration', 'plafond', 'employeur', 'dimanche', 'supermarche', 'validite', 'teletravail', 'absences', 'reforme',
+  'ticket', 'cheque', 'repas', 'emetteurs', 'carte', 'edenred', 'swile', 'up', 'bimpli',
 ];
 export const PLANNED_IDS = new Set<string>([...PLANNED_GUIDES, 'home', 'method', 'about', 'widget', 'contact', 'editorial', 'privacy', 'terms', 'cookies']);

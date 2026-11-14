@@ -26,7 +26,7 @@ export interface Helpers extends Kit {
   n: (x: number, d?: number) => string; eur: (x: number, d?: number) => string; day: (iso: string) => string; my: (ym: string) => string;
 }
 
-export type Group = 'argent' | 'usage' | 'regles';
+export type Group = 'essentiel' | 'argent' | 'usage' | 'regles' | 'cartes';
 
 export interface LangPage {
   /** Segment d'URL, minuscules et tirets, sans accent. */

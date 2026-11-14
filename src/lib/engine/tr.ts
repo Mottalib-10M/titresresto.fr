@@ -114,3 +114,87 @@ export function regimeA(iso: string, adoptee: boolean, version: 'an' | 'senat') 
     remisesInterdites: adoptee && annee >= 2027 && version === 'senat',
   };
 }
+
+/** Une année de titres : jours travaillés avec repas par semaine × semaines travaillées (service-public F21059 :
+ *  un titre par repas compris dans l'horaire de travail). */
+export function annuel(joursSemaine: number, semaines: number, valeur: number, tauxPct: number, plafond = PLAFOND_2026) {
+  const n = Math.max(0, Math.floor(Math.min(7, joursSemaine))) * Math.max(0, Math.floor(Math.min(52, semaines)));
+  return { ...mois(n, valeur, tauxPct, plafond), parMois: r2(n / 12) };
+}
+
+/** Payer une addition en titres papier : le commerçant ne rend pas la monnaie, et la dépense du jour reste
+ *  plafonnée (R. 3262-10). Deux façons : rester sous l'addition et compléter, ou arrondir au-dessus et perdre l'écart. */
+export function papier(addition: number, valeur: number, plafondJour = PLAFOND_JOUR) {
+  const a = Math.max(0, addition), v = Math.max(0.01, valeur);
+  const plafondTitres = Math.floor((plafondJour + 1e-9) / v);
+  const bas = Math.min(Math.floor((a + 1e-9) / v), plafondTitres);
+  const complement = r2(a - bas * v);
+  const haut = Math.ceil(a / v - 1e-9);
+  const hautOk = haut <= plafondTitres;
+  return { bas, complement, haut, hautOk, perte: hautOk ? r2(haut * v - a) : 0, plafondTitres, carteTitres: r2(Math.min(a, plafondJour)), carteReste: r2(Math.max(0, a - plafondJour)) };
+}
+
+/** Coût réel d'un déjeuner payé en titres : prix moins la part de l'employeur (une seule valeur de titre par repas). */
+export function dejeuner(prix: number, valeur: number, tauxPct: number, repasMois: number) {
+  const p = partage(valeur, tauxPct);
+  const n = Math.max(0, Math.floor(repasMois));
+  const enTitres = Math.min(Math.max(0, prix), p.valeur, PLAFOND_JOUR);
+  const complement = r2(Math.max(0, prix) - enTitres);
+  const coutReel = r2(Math.max(0, Math.max(0, prix) - p.employeur));
+  return { enTitres: r2(enTitres), complement, coutReel, coutReelMois: r2(n * coutReel), employeurMois: r2(n * p.employeur), prixMois: r2(n * Math.max(0, prix)), couvert: prix > 0 ? Math.min(100, (p.employeur / prix) * 100) : 0 };
+}
+
+/** Écouler un solde : jours d'utilisation nécessaires, au rythme choisi puis au plafond journalier. */
+export function ecouler(solde: number, depenseJour: number, joursSemaine: number) {
+  const s = Math.max(0, solde), d = Math.max(0.01, Math.min(depenseJour, PLAFOND_JOUR)), j = Math.max(1, Math.min(7, Math.floor(joursSemaine)));
+  const jours = Math.ceil(s / d - 1e-9);
+  return { jours, semaines: Math.ceil(jours / j), joursAuPlafond: Math.ceil(s / PLAFOND_JOUR - 1e-9), rythme: r2(d) };
+}
+
+/** Ancien millésime : peut-on écouler le solde de l'année passée avant son dernier jour (fin février en carte) ?
+ *  Les titres de l'année ne servent qu'après épuisement de ceux de l'année écoulée (service-public F21059). */
+export function ancienSolde(solde: number, depuis: string, depenseJour: number, joursSemaine: number, millesime = 2026) {
+  const v = validite(millesime, 'carte');
+  const joursCal = Math.max(0, joursEntre(depuis, v.dernierJour) + 1);
+  const j = Math.max(1, Math.min(7, Math.floor(joursSemaine)));
+  const joursUsage = Math.floor((joursCal * j) / 7);
+  const d = Math.max(0, Math.min(depenseJour, PLAFOND_JOUR));
+  const capacite = r2(joursUsage * d);
+  const s = Math.max(0, solde);
+  return { dernierJour: v.dernierJour, finEchange: v.finEchange, joursCal, joursUsage, capacite, reste: r2(Math.max(0, s - capacite)), ok: capacite >= s, rythmeNecessaire: joursUsage ? r2(s / joursUsage) : s };
+}
+
+/** Plusieurs paiements le même jour : le plafond journalier se partage entre eux. */
+export function cumulJour(dejaPaye: number, achat: number) {
+  const reste = r2(Math.max(0, PLAFOND_JOUR - Math.max(0, dejaPaye)));
+  const passe = r2(Math.min(Math.max(0, achat), reste));
+  return { resteDuJour: reste, passe, complement: r2(Math.max(0, achat) - passe) };
+}
+
+/** Un mois en titres papier contre la carte : la monnaie non rendue sur chaque repas, si l'on arrondit au titre supérieur. */
+export function carnet(addition: number, valeur: number, repasMois: number) {
+  const p = papier(addition, valeur);
+  const n = Math.max(0, Math.floor(repasMois));
+  return { ...p, perteMois: r2(n * p.perte), complementMois: r2(n * p.complement), titresMois: n * (p.hautOk ? p.haut : p.bas) };
+}
+
+/** Coût d'acceptation pour un commerçant : commission en % du montant encaissé en titres, plus un fixe par paiement. */
+export function commission(montantMois: number, tauxPct: number, fixe: number, paiementsMois: number) {
+  const m = Math.max(0, montantMois), t = Math.max(0, Math.min(100, tauxPct));
+  const mois_ = r2((m * t) / 100 + Math.max(0, fixe) * Math.max(0, Math.floor(paiementsMois)));
+  return { mois: mois_, an: r2(mois_ * 12), net: r2(m - mois_), tauxEffectif: m > 0 ? (mois_ / m) * 100 : 0 };
+}
+
+/** Département du commerce par rapport au lieu de travail (service-public F21059). */
+export type Zone = 'meme' | 'limitrophe' | 'autre';
+/** Pourquoi une carte de titres est refusée : la première règle qui bloque, dans l'ordre où la caisse les teste. */
+export function diagnostic(a: { jour: Jour; travailleCeJour: boolean; autorise: boolean; produit: Produit; montant: number; dejaPaye: number; solde: number; zone: Zone; deplacement: boolean }) {
+  if (a.zone === 'autre' && !a.deplacement) return { ok: false, motif: 'zone' as const, passe: 0 };
+  const base = peutPayer({ annee: 2026, jour: a.jour, travailleCeJour: a.travailleCeJour, autorise: a.autorise, produit: a.produit, montant: a.montant, adoptee: true, version: 'senat' });
+  if (!base.ok) return { ok: false, motif: base.motif, passe: 0 };
+  const c = cumulJour(a.dejaPaye, a.montant);
+  if (c.resteDuJour <= 0) return { ok: false, motif: 'plafond' as const, passe: 0 };
+  const passe = r2(Math.min(c.passe, Math.max(0, a.solde)));
+  if (passe <= 0) return { ok: false, motif: 'solde' as const, passe: 0 };
+  return { ok: true, motif: (passe < a.montant ? (passe < c.passe ? 'solde' : 'plafond') : 'ok') as 'ok' | 'solde' | 'plafond', passe };
+}

@@ -14,7 +14,11 @@ import { HOME } from '../src/content/home';
 import { PLANNED_IDS } from '../src/lib/planned';
 
 /* Ni concurrent, ni moteur de recherche, ni promesse d'autorité sur le site. */
-const BANNED_ALL = [/—/, /–/, /\bgoogle\b/i, /erster? (Such)?treffer|first (search )?result|premier résultat/i, /swile|pluxee|edenred|ticket restaurant|up déjeuner|bimpli|\bconecs\b|forbes/i, /garanti (conforme|valable)|site officiel|officiellement (agréé|certifié)|guaranteed (valid|compliant)|officially (approved|certified)/i];
+/* Marques des émetteurs : seulement sur les pages qui les nomment pour informer (consigne de l'éditeur du 2026-11-14 :
+   pages émetteurs neutres, « non affilié », aucun logo) ; partout ailleurs, interdites. */
+const MARQUES = /swile|pluxee|edenred|ticket restaurant|up ?déjeuner|bimpli|\bconecs\b|forbes/i;
+const PAGES_MARQUES = new Set(['ticket', 'cheque', 'repas', 'emetteurs', 'carte', 'edenred', 'swile', 'up', 'bimpli', 'dimanche']);
+const BANNED_ALL = [/—/, /–/, /\bgoogle\b/i, /erster? (Such)?treffer|first (search )?result|premier résultat/i, /garanti (conforme|valable)|site officiel|officiellement (agréé|certifié)|guaranteed (valid|compliant)|officially (approved|certified)/i];
 const BANNED_EN = [/it'?s important to note/i, /dive into/i, /\bdelve/i, /whether you'?re/i, /navigate the/i, /\bMoreover\b/, /\bAdditionally\b/, /\bFurthermore\b/, /game.?changer/i, /\bunlock/i, /in today'?s world/i, /\bseamless/i, /\$ ?\d/];
 const BANNED_FR = [/il est important de noter/i, /dans le monde d'aujourd'hui/i, /n'hésitez pas/i, /plongeons/i, /\ben outre\b/i, /€\d/, /\bde surcroît\b/i, /force est de constater/i, /\bil convient de noter\b/i];
 const LANGS = ['fr', 'en'] as const;
@@ -58,7 +62,7 @@ describe('fichiers de contenu', () => {
       it('corps : au moins 150 mots de prose, tableaux à part', () => { expect(words(text(x.body))).toBeGreaterThanOrEqual(150); });
       it('corps : au plus 3 sections H2', () => { expect(x.body.match(/<h2[\s>]/g)?.length ?? 0).toBeLessThanOrEqual(3); });
       it('aucune tournure interdite ni tiret long', () => {
-        const res = [...BANNED_ALL, ...(x.lang === 'en' ? BANNED_EN : BANNED_FR)];
+        const res = [...BANNED_ALL, ...(PAGES_MARQUES.has(x.id) ? [] : [MARQUES]), ...(x.lang === 'en' ? BANNED_EN : BANNED_FR)];
         for (const re of res) for (const part of [x.title, x.description, x.intro, x.resume, x.body, ...x.faqs.flatMap((f) => [f.q, f.a])]) expect(part, String(re)).not.toMatch(re);
       });
       it('FAQ : 3 à 5 questions, réponses de 40 à 90 mots, uniques sur le site', () => {

@@ -10,3 +10,4 @@ export const pc = (x: number, l: L) => (l === 'fr' ? `${formatDecimal(x, 1, l)} 
 export { P };
 export const EX = P.exoneration, U = P.usage, VA = P.validite, M = P.marche, PPL = P.ppl;
 export const PL = EX.plafond['2026'];
+export const EM = P.emetteurs;

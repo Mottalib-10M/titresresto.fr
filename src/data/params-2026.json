@@ -5,7 +5,9 @@
   "valid_from": "2026-01-01",
   "valid_to": "2026-12-31",
   "exoneration": {
-    "plafond": { "2026": 7.32 },
+    "plafond": {
+      "2026": 7.32
+    },
     "plafond2027": null,
     "tauxMin": 50,
     "tauxMax": 60,
@@ -31,7 +33,7 @@
     "commissionAcceptationMoyenne": 4,
     "valeurFacialeMoyenne2024": 8.94,
     "employeurs": 235000,
-    "_source": "rapport Sénat n° 141, exposé général et article 2 (données CNTR)"
+    "_source": "rapport Sénat n° 141, exposé général et article 2 (données CNTR) ; commissionAcceptationMoyenne : commission moyenne payée par les commerçants, en % (rapport Sénat n° 141)"
   },
   "ppl": {
     "numeroAN": 2892,
@@ -92,6 +94,114 @@
         "fr": "Commission nationale des titres-restaurant (CNTR)",
         "en": "National meal-voucher commission (CNTR, in French)"
       }
+    },
+    "cntrEmetteurs": {
+      "url": "https://www.cntr.fr/wp-content/uploads/2024/08/Societes-emettrices-de-titres-restaurant.pdf",
+      "label": {
+        "fr": "CNTR : liste des sociétés émettrices de titres-restaurant (PDF, lu le 14 novembre 2026)",
+        "en": "CNTR: list of meal voucher issuing companies (PDF in French, read 14 November 2026)"
+      }
+    },
+    "cntrPlafond": {
+      "url": "https://www.cntr.fr/au-1er-janvier-2026-actualisation-du-plafond-de-la-contribution-patronale-a-lacquisition-de-titres-restaurant-par-les-salaries/",
+      "label": {
+        "fr": "CNTR : plafond de la contribution patronale fixé à 7,32 € au 1er janvier 2026 (publié le 28 janvier 2026)",
+        "en": "CNTR: employer contribution cap set at €7.32 from 1 January 2026 (published 28 January 2026, in French)"
+      }
+    },
+    "cntrAgrement": {
+      "url": "https://www.cntr.fr/autre-commerce-alimentaire/",
+      "label": {
+        "fr": "CNTR : demande d'agrément d'un commerce pour accepter les titres-restaurant (lu le 14 novembre 2026)",
+        "en": "CNTR: how a shop applies for approval to accept meal vouchers (read 14 November 2026, in French)"
+      }
+    },
+    "edenred": {
+      "url": "https://www.edenred.fr/ticket-restaurant",
+      "label": {
+        "fr": "Edenred : page publique de la carte Ticket Restaurant (lue le 14 novembre 2026)",
+        "en": "Edenred: public page of the Ticket Restaurant card (read 14 November 2026, in French)"
+      }
+    },
+    "swile": {
+      "url": "https://www.swile.co/fr-fr/solutions/meal-vouchers",
+      "label": {
+        "fr": "Swile : page publique des titres-restaurant (lue le 14 novembre 2026)",
+        "en": "Swile: public meal voucher page (read 14 November 2026, in French)"
+      }
+    },
+    "swileCga": {
+      "url": "https://swile.co/fr-fr/legal/cgu-swile-bimpli",
+      "label": {
+        "fr": "Swile et Bimpli : conditions générales d'affiliation des commerçants, mises à jour le 13 mars 2026 (lues le 14 novembre 2026)",
+        "en": "Swile and Bimpli: merchant affiliation terms, updated 13 March 2026 (read 14 November 2026, in French)"
+      }
     }
+  },
+  "emetteurs": {
+    "listeCntr": [
+      {
+        "nom": "Benefiz",
+        "support": "carte"
+      },
+      {
+        "nom": "Swile, produits Bimpli",
+        "support": "papier et carte"
+      },
+      {
+        "nom": "Contakt",
+        "support": "carte"
+      },
+      {
+        "nom": "Coup de Pousse",
+        "support": "carte"
+      },
+      {
+        "nom": "Tickets Restaurant, Edenred",
+        "support": "papier et carte"
+      },
+      {
+        "nom": "Ekip",
+        "support": "carte"
+      },
+      {
+        "nom": "Glady",
+        "support": "carte"
+      },
+      {
+        "nom": "KyzPay",
+        "support": "application"
+      },
+      {
+        "nom": "Pluxee",
+        "support": "papier et carte"
+      },
+      {
+        "nom": "Restoflash",
+        "support": "application"
+      },
+      {
+        "nom": "Swile",
+        "support": "carte"
+      },
+      {
+        "nom": "Up Déjeuner, Up One",
+        "support": "papier et carte"
+      },
+      {
+        "nom": "Wiismile",
+        "support": "carte"
+      },
+      {
+        "nom": "Worklife",
+        "support": "carte"
+      }
+    ],
+    "listeCntrDate": "2024-08-29",
+    "delaiAgrementJoursOuvres": 40,
+    "edenredReseau": 300000,
+    "swileReseau": 220000,
+    "retrieved_at": "2026-11-14",
+    "_source": "CNTR, « Sociétés émettrices de titres-restaurant » (PDF du 29/08/2024, lu le 14/11/2026) ; CNTR, page d'accueil (délai de traitement des dossiers : 40 jours ouvrés) ; edenred.fr/ticket-restaurant (300 000 restaurants, commerces et plateformes partenaires) ; swile.co, page titres-resto (plus de 220 000 établissements) ; CGA Swile et Bimpli du 13/03/2026 (Bimpli, marque dont Swile est propriétaire)"
   }
 }

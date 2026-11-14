@@ -17,9 +17,9 @@ const ex = mois(20, 10, 50);
 const v26 = validite(2026, 'carte'), v26p = validite(2026, 'papier');
 
 const fr: HomeLang = {
-  title: 'Titres-restaurant 2026 : part employeur, plafond, simulateur',
+  title: 'Titre restaurant 2026 : part employeur, plafond, simulateur',
   description: 'Simulateur titres-restaurant 2026 : part employeur exonérée jusqu\'à 7,32 €, plafond de 25 € par jour, courses, dimanche et réforme 2027 en cours au Sénat.',
-  h1: 'Titres-restaurant 2026 : combien l\'employeur paie et ce qui change',
+  h1: 'Titre restaurant 2026 : combien l\'employeur paie et ce qui change',
   homeCard: 'Votre mois de titres-restaurant : part payée par l\'employeur, retenue sur la paie et part exonérée',
   intro: 'Tapez la valeur de vos titres-restaurant, la part payée par l\'employeur et le nombre de titres du mois : le simulateur donne aussitôt ce que l\'employeur vous verse en plus, ce qui est retenu sur votre salaire et ce qui échappe aux cotisations.',
   resume: `Un titre-restaurant est payé en partie par l'employeur, en partie par le salarié, par une retenue sur la paie. Pour que la part de l'employeur échappe aux cotisations sociales et à l'impôt sur le revenu, elle doit représenter entre ${EX.tauxMin} % et ${EX.tauxMax} % de la valeur du titre et ne pas dépasser ${eur(PL, 'fr')} par titre pour les titres de 2026. Les valeurs qui tirent tout le parti de ce plafond vont de ${eur(f.min, 'fr')} à ${eur(f.max, 'fr')}. Côté dépense, vous pouvez payer jusqu'à ${eur(U.plafondJour, 'fr')} par jour, chez un restaurateur ou pour des produits alimentaires, ces derniers jusqu'au ${day(U.toutAlimentaireJusquau, 'fr')} en l'état du droit. Le dimanche et les jours fériés, les titres ne servent qu'à ceux qui travaillent ce jour-là, si l'employeur l'a prévu. Une proposition de loi, adoptée par l'Assemblée nationale le ${day(PPL.adoptionAN, 'fr')} et examinée au Sénat le ${day(PPL.seanceSenat, 'fr')}, prolongerait les courses en 2027 et changerait d'autres règles en 2028 : rien n'est encore voté.`,
