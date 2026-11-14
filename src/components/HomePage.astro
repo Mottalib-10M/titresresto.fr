@@ -35,14 +35,14 @@ const fecha = (iso: string) => displayDate(iso, lang === 'fr' ? 'fr-FR' : 'en-GB
   <div id="simulateur" data-outil data-chrome class="scroll-mt-20"><Tool kind="partage" lang={lang} idPrefix="home" /></div>
   <p class="mt-2 text-sm text-navy-600" data-chrome>{ui.privacyLine}</p>
   <Clamp text={x.resume} lang={lang} id="clamp-home" class="my-8" />
-  <section class="mt-8" aria-labelledby="questions-h" data-chrome>
+  <aside class="mt-8" aria-labelledby="questions-h" data-chrome>
     <h2 id="questions-h" class="text-2xl font-bold text-navy-900">{x.questionsTitle}</h2>
-    <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+    <div class="mt-4 grid gap-3 sm:grid-cols-2">
       {x.questions.filter((q) => hasRoute(q.id, lang)).map((q) => (
-        <li><a href={route(q.id, lang)} class="block h-full rounded-lg border-2 border-accent-500 bg-white px-4 py-3 hover:bg-accent-50"><span class="font-semibold text-accent-700">{q.q} →</span><span class="mt-1 block text-sm text-navy-700">{q.a}</span></a></li>
+        <a href={route(q.id, lang)} class="block h-full rounded-lg border-2 border-accent-500 bg-white px-4 py-3 hover:bg-accent-50"><span class="font-semibold text-accent-700">{q.q} →</span><span class="mt-1 block text-sm text-navy-700">{q.a}</span></a>
       ))}
-    </ul>
-  </section>
+    </div>
+  </aside>
   <section class="mt-10">
     <h2 class="text-2xl font-bold text-navy-900">{x.chiffresTitle}</h2>
     <div class="mt-4 overflow-x-auto">
@@ -75,12 +75,12 @@ const fecha = (iso: string) => displayDate(iso, lang === 'fr' ? 'fr-FR' : 'en-GB
   <section class="mt-10" data-chrome>
     <h2 class="text-2xl font-bold text-navy-900">{x.guidesTitle}</h2>
     {GROUPS.map((g) => (
-      <div class="mt-5">
+      <article class="mt-5">
         <h3 class="text-lg font-semibold text-navy-900">{g.label[lang]}</h3>
-        <ul class="mt-2 grid gap-2 text-sm md:grid-cols-3">
-          {GUIDES.filter((p) => p.group === g.id && hasRoute(p.id, lang)).map((p) => <li><a href={route(p.id, lang)} class="block h-full rounded-lg border border-navy-200 px-3 py-2 hover:border-accent-300 hover:bg-accent-50"><span class="font-semibold text-accent-700 underline underline-offset-2">{p[lang].nav} →</span><span class="block text-navy-600">{p[lang].card}</span></a></li>)}
-        </ul>
-      </div>
+        <div class="mt-2 grid gap-2 text-sm md:grid-cols-3">
+          {GUIDES.filter((p) => p.group === g.id && hasRoute(p.id, lang)).map((p) => <a href={route(p.id, lang)} class="block h-full rounded-lg border border-navy-200 px-3 py-2 hover:border-accent-300 hover:bg-accent-50"><span class="font-semibold text-accent-700 underline underline-offset-2">{p[lang].nav} →</span><span class="block text-navy-600">{p[lang].card}</span></a>)}
+        </div>
+      </article>
     ))}
     <p class="mt-6 text-sm text-navy-700"><a href={route('method', lang)} class="font-medium text-accent-700 underline">{L('Comment calculent les simulateurs et d\'où viennent les chiffres', 'How the simulators calculate and where the figures come from')}</a> · <a href={route('about', lang)} class="font-medium text-accent-700 underline">{L('Qui publie ce site', 'Who publishes this site')}</a></p>
   </section>
