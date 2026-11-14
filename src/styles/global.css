@@ -104,6 +104,21 @@ h1 { font-weight: 700; } h2 { font-weight: 650; } h3 { font-weight: 600; }
   .clamp-toggle:checked ~ .clamp-more { display: none; }
   .clamp-more { display: inline-block; cursor: pointer; margin-top: .25rem; font-size: .875rem; font-weight: 600; color: var(--color-accent-700); text-decoration: underline; text-underline-offset: 3px; }
   .clamp-toggle:focus-visible ~ .clamp-more { outline: 2px solid var(--color-accent-500); outline-offset: 3px; }
+  /* Sections repliées (<details class="fold">, Body.astro et HomePage.astro). Testeurs naïfs du 2026-11-14 :
+     sans ces règles, le ▶ du navigateur tombait seul sur sa ligne, le titre H2 en dessous avec ses marges de
+     prose laissait un grand blanc, et les trois testeurs ont cru à du texte manquant. Le titre et le chevron
+     sont sur la même ligne, dans un cadre, avec « Touchez pour lire » ; le texte reste dans le HTML. */
+  .fold { border: 1px solid var(--color-navy-200); border-radius: .5rem; margin: .6rem 0; padding: 0 .9rem; background: #fff; }
+  .fold > summary { cursor: pointer; list-style: none; display: flex; align-items: flex-start; gap: .75rem; padding: .75rem 0; }
+  .fold > summary::-webkit-details-marker { display: none; }
+  .fold > summary::marker { content: ''; }
+  .fold > summary > .fold-h { flex: 1 1 auto; margin: 0 !important; font-size: 1.08rem !important; line-height: 1.35; font-weight: 650; color: var(--color-navy-900); }
+  .fold > summary > .fold-h::after { content: 'Touchez pour lire'; display: block; margin-top: .15rem; font-family: system-ui, sans-serif; font-size: .8125rem; font-weight: 500; color: var(--color-accent-700); }
+  html[lang="en"] .fold > summary > .fold-h::after { content: 'Tap to read'; }
+  .fold[open] > summary > .fold-h::after { content: none; }
+  .fold > summary::after { content: '\2304'; flex: none; font-size: 1.25rem; line-height: 1; color: var(--color-navy-600); transition: transform .15s; }
+  .fold[open] > summary::after { transform: rotate(180deg); }
+  .fold > summary:focus-visible { outline: 2px solid var(--color-accent-500); outline-offset: 2px; }
 }
 
 /* Lisibilité des aides et des résultats (testeurs naïfs du 2026-11-10, 11 sites sur 11) : le texte

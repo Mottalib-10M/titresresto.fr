@@ -131,7 +131,11 @@ export function papier(addition: number, valeur: number, plafondJour = PLAFOND_J
   const complement = r2(a - bas * v);
   const haut = Math.ceil(a / v - 1e-9);
   const hautOk = haut <= plafondTitres;
-  return { bas, complement, haut, hautOk, perte: hautOk ? r2(haut * v - a) : 0, plafondTitres, carteTitres: r2(Math.min(a, plafondJour)), carteReste: r2(Math.max(0, a - plafondJour)) };
+  // « Un chèque de plus » : toujours bas + 1 (testeurs naïfs du 2026-11-14 : pour 18 € en chèques de 9 €, haut = bas = 2
+  // et l'écran annonçait « 0 € perdus » alors qu'un 3e chèque ferait 27 €, au-delà du plafond de 25 €).
+  const plus = bas + 1;
+  const plusOk = plus <= plafondTitres;
+  return { bas, complement, haut, hautOk, perte: hautOk ? r2(haut * v - a) : 0, plus, plusOk, pertePlus: plusOk ? r2(Math.max(0, plus * v - a)) : 0, plafondTitres, carteTitres: r2(Math.min(a, plafondJour)), carteReste: r2(Math.max(0, a - plafondJour)) };
 }
 
 /** Coût réel d'un déjeuner payé en titres : prix moins la part de l'employeur (une seule valeur de titre par repas). */

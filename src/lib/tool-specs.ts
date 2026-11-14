@@ -26,7 +26,7 @@ const A = (a: Args | undefined, k: string, d: number | string) => (a && a[k] !==
 
 /* Champs communs : valeur du titre et part de l'employeur. */
 const VALEUR = (l: Lang, def: number) => ({ id: 'valeur', label: T(l, 'Valeur d\'un titre', 'Value of one voucher'), def, unit: '€', decimals: 2, max: 100, help: T(l, 'Le montant écrit sur le titre ou crédité par repas sur la carte.', 'The amount printed on the voucher, or credited per meal on the card.') });
-const TAUX = (l: Lang, def: number) => ({ id: 'taux', label: T(l, 'Part payée par l\'employeur', 'Share paid by the employer'), def, unit: '%', decimals: 1, max: 100, help: T(l, `La loi demande entre ${TAUX_TXT(l)} pour que la part soit exonérée.`, `The law asks for ${TAUX_TXT(l)} for the share to be exempt.`) });
+const TAUX = (l: Lang, def: number) => ({ id: 'taux', label: T(l, 'Part payée par l\'employeur', 'Share paid by the employer'), def, unit: '%', decimals: 1, max: 100, help: T(l, `La loi demande entre ${TAUX_TXT(l)} pour que cette part soit exonérée, c'est-à-dire sans charges ni impôt.`, `The law asks for ${TAUX_TXT(l)} for this share to be exempt, that is free of charges and tax.`) });
 const TAUX_TXT = (l: Lang) => T(l, `${E.TAUX_MIN} % et ${E.TAUX_MAX} %`, `between ${E.TAUX_MIN}% and ${E.TAUX_MAX}%`);
 const ANNEE = (l: Lang, def: string) => ({ kind: 'select' as const, id: 'annee', label: T(l, 'Année de l\'achat', 'Year of the purchase'), def, options: [{ value: '2026', label: '2026' }, { value: '2027', label: '2027' }, { value: '2028', label: '2028' }] });
 const ADOPTEE = (l: Lang) => ({ kind: 'choice' as const, id: 'adoptee', label: T(l, 'Si la loi en discussion est votée', 'If the bill now in Parliament passes'), def: 'oui', options: [{ value: 'oui', label: T(l, 'Votée', 'Passed') }, { value: 'non', label: T(l, 'Rejetée', 'Rejected') }], help: T(l, 'Le Sénat l\'examine le 19 novembre 2026 : rien n\'est encore voté.', 'The Senate debates it on 19 November 2026: nothing has been passed yet.'), when: (v: V) => s(v, 'annee') !== '2026' });
@@ -65,19 +65,19 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
       const m = E.mois(n(v, 'titres'), n(v, 'valeur'), n(v, 'taux'));
       const p = E.partage(n(v, 'valeur'), n(v, 'taux'));
       return {
-        label: T(l, 'Ce que l\'employeur vous verse en plus ce mois-ci', 'What your employer adds this month'),
+        label: T(l, 'Ce que votre employeur paie de vos repas ce mois-ci', 'What your employer pays towards your meals this month'),
         value: eur0(m.employeur, l),
-        hyp: T(l, `Pour ${int(m.n, l)} titres de ${eur(p.valeur, l)}, payés à ${pct(p.taux, l)} par l'employeur.`, `For ${int(m.n, l)} vouchers of ${eur(p.valeur, l)}, ${pct(p.taux, l)} paid by the employer.`),
+        hyp: T(l, `Vous payez ${eur0(m.retenue, l)} (retenus sur votre salaire) et vous recevez ${eur0(m.credite, l)} à dépenser en repas : ${eur0(m.employeur, l)} de plus que ce que vous avez payé.`, `You pay ${eur0(m.retenue, l)} (deducted from your pay) and receive ${eur0(m.credite, l)} to spend on meals: ${eur0(m.employeur, l)} more than you paid.`),
         sub: p.tauxOk
-          ? (p.reintegre > 0 ? T(l, `Au-delà de ${eur(PL, l)} par titre, ${eur(p.reintegre, l)} par titre sont soumis aux cotisations.`, `Above ${eur(PL, l)} per voucher, ${eur(p.reintegre, l)} per voucher is subject to contributions.`) : T(l, 'Toute la part de l\'employeur est exonérée de cotisations et d\'impôt.', 'The whole employer share is free of contributions and income tax.'))
-          : T(l, `Hors de la fourchette ${TAUX_TXT(l)}, la part de l'employeur n'est pas exonérée.`, `Outside ${TAUX_TXT(l)}, the employer share is not exempt.`),
+          ? (p.reintegre > 0 ? T(l, `Au-delà de ${eur(PL, l)} par titre, ${eur(p.reintegre, l)} par titre sont taxés comme du salaire.`, `Above ${eur(PL, l)} per voucher, ${eur(p.reintegre, l)} per voucher is taxed like pay.`) : T(l, 'Vous ne payez ni charges ni impôt sur la part de l\'employeur.', 'You pay no social charges or income tax on the employer share.'))
+          : T(l, `Hors de la fourchette ${TAUX_TXT(l)}, la part de l'employeur est taxée comme du salaire.`, `Outside ${TAUX_TXT(l)}, the employer share is taxed like pay.`),
         rows: [
-          [T(l, 'Crédité sur la carte ou en titres', 'Credited on the card or in vouchers'), eur0(m.credite, l)],
+          [T(l, 'À dépenser en repas (carte ou titres)', 'To spend on meals (card or vouchers)'), eur0(m.credite, l)],
           [T(l, 'Retenu sur votre salaire', 'Deducted from your pay'), eur0(m.retenue, l)],
-          [T(l, 'Part exonérée (employeur)', 'Exempt share (employer)'), eur0(m.exonere, l)],
-          [T(l, 'Part soumise aux cotisations', 'Share subject to contributions'), eur0(m.reintegre, l)],
+          [T(l, 'Part de l\'employeur sans charges ni impôt', 'Employer share free of charges and tax'), eur0(m.exonere, l)],
+          [T(l, 'Part de l\'employeur taxée comme du salaire', 'Employer share taxed like pay'), eur0(m.reintegre, l)],
         ],
-        note: T(l, `Plafond d'exonération des titres 2026 : ${eur(PL, l)} par titre. Celui de 2027 n'est pas encore publié.`, `Exemption cap for 2026 vouchers: ${eur(PL, l)} per voucher. The 2027 cap is not yet published.`),
+        note: T(l, `Pour les titres 2026, la part de l'employeur reste sans charges ni impôt jusqu'à ${eur(PL, l)} par titre. Le plafond de 2027 n'est pas encore publié.`, `For 2026 vouchers, the employer share stays free of charges and tax up to ${eur(PL, l)} per voucher. The 2027 cap is not yet published.`),
       };
     },
   }),
@@ -185,7 +185,7 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
   validite: (l, a) => ({
     exemple: true,
     inputs: [
-      { kind: 'select', id: 'millesime', label: T(l, 'Année écrite sur le titre (millésime)', 'Year printed on the voucher'), def: String(A(a, 'millesime', '2026')), options: ['2025', '2026', '2027'].map((x) => ({ value: x, label: x })) },
+      { kind: 'select', id: 'millesime', label: T(l, 'Année écrite sur le titre', 'Year printed on the voucher'), def: String(A(a, 'millesime', '2026')), options: ['2025', '2026', '2027'].map((x) => ({ value: x, label: x })) },
       { kind: 'choice', id: 'support', label: T(l, 'Support', 'Format'), def: String(A(a, 'support', 'carte')), options: [{ value: 'carte', label: T(l, 'Carte ou appli', 'Card or app') }, { value: 'papier', label: T(l, 'Papier', 'Paper') }] },
     ],
     run: (v) => {
@@ -197,7 +197,7 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
         sub: T(l, `Échange possible jusqu'au ${day(r.finEchange, l)}.\nEnsuite, la valeur est perdue pour vous.`, `Exchange possible until ${day(r.finEchange, l)}.\nAfter that, the value is lost to you.`),
         rows: [
           [T(l, 'Fin d\'utilisation', 'Last use'), day(r.dernierJour, l)],
-          [T(l, 'Fin de l\'échange', 'End of exchange'), day(r.finEchange, l)],
+          [T(l, 'Dernier jour pour échanger les titres périmés', 'Last day to exchange expired vouchers'), day(r.finEchange, l)],
         ],
         note: T(l, 'La plupart des cartes reportent seules le solde sur le millésime suivant ; le papier doit être rendu à l\'employeur.', 'Most cards roll the balance over to the next year on their own; paper must be handed back to the employer.'),
       };
@@ -265,10 +265,10 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
       const t = E.titresDuMois(n(v, 'jours'), 0, abs);
       const perdu = E.mois(abs, n(v, 'valeur'), n(v, 'taux'));
       return {
-        label: T(l, 'Part de l\'employeur en moins', 'Employer share you lose'),
+        label: T(l, 'Ce que vous perdez vraiment ce mois-ci', 'What you really lose this month'),
         value: eur0(perdu.employeur, l),
-        hyp: T(l, `${int(abs, l)} jours d'absence sur ${int(n(v, 'jours'), l)} : ${int(abs, l)} titres en moins.`, `${int(abs, l)} days off out of ${int(n(v, 'jours'), l)}: ${int(abs, l)} fewer vouchers.`),
-        sub: T(l, `Il vous reste ${int(t, l)} titres ce mois-ci.\nLa retenue sur salaire baisse aussi de ${eur0(perdu.retenue, l)}.`, `You keep ${int(t, l)} vouchers this month.\nThe deduction from pay also falls by ${eur0(perdu.retenue, l)}.`),
+        hyp: T(l, `${int(abs, l)} titres de ${eur(n(v, 'valeur'), l)} en moins (${eur0(perdu.credite, l)}), mais ${eur0(perdu.retenue, l)} de moins retenus sur votre salaire : la perte réelle est la part de l'employeur.`, `${int(abs, l)} fewer vouchers of ${eur(n(v, 'valeur'), l)} (${eur0(perdu.credite, l)}), but ${eur0(perdu.retenue, l)} less deducted from your pay: the real loss is the employer share.`),
+        sub: T(l, `${int(abs, l)} jours d'absence sur ${int(n(v, 'jours'), l)} prévus.\nIl vous reste ${int(t, l)} titres ce mois-ci.`, `${int(abs, l)} days off out of ${int(n(v, 'jours'), l)} planned.\nYou keep ${int(t, l)} vouchers this month.`),
         rows: [
           [T(l, 'Titres restants', 'Vouchers left'), int(t, l)],
           [T(l, 'Valeur des titres en moins', 'Value of vouchers lost'), eur0(perdu.credite, l)],
@@ -336,10 +336,10 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
       return {
         label: T(l, 'Chèques à donner sans rien perdre', 'Vouchers to hand over without losing anything'),
         value: int(r.bas, l),
-        hyp: T(l, `Addition de ${eur(n(v, 'addition'), l)}, chèques de ${eur(n(v, 'valeur'), l)}, jour de semaine.`, `A ${eur(n(v, 'addition'), l)} bill, ${eur(n(v, 'valeur'), l)} vouchers, on a weekday.`),
+        hyp: T(l, `Addition de ${eur(n(v, 'addition'), l)}, chèques de ${eur(n(v, 'valeur'), l)}, au plus ${eur(E.PLAFOND_JOUR, l)} en titres dans la journée.`, `A ${eur(n(v, 'addition'), l)} bill, ${eur(n(v, 'valeur'), l)} vouchers, at most ${eur(E.PLAFOND_JOUR, l)} in vouchers that day.`),
         sub: r.complement > 0 ? T(l, `Complément à payer autrement : ${eur(r.complement, l)}.`, `Top-up to pay another way: ${eur(r.complement, l)}.`) : T(l, 'Le compte est juste.', 'It adds up exactly.'),
         rows: [
-          [T(l, 'Avec un chèque de plus', 'With one more voucher'), r.hautOk && r.perte > 0 ? T(l, `${int(r.haut, l)} chèques, ${eur(r.perte, l)} perdus`, `${int(r.haut, l)} vouchers, ${eur(r.perte, l)} lost`) : r.hautOk ? T(l, 'inutile', 'not needed') : T(l, `impossible : plafond de ${eur(E.PLAFOND_JOUR, l)}`, `not allowed: ${eur(E.PLAFOND_JOUR, l)} limit`)],
+          [T(l, 'Avec un chèque de plus', 'With one more voucher'), r.plusOk ? T(l, `${int(r.plus, l)} chèques, ${eur(r.pertePlus, l)} perdus`, `${int(r.plus, l)} vouchers, ${eur(r.pertePlus, l)} lost`) : T(l, `impossible : plafond de ${eur(E.PLAFOND_JOUR, l)}`, `not allowed: ${eur(E.PLAFOND_JOUR, l)} limit`)],
           [T(l, 'Chèques au plus ce jour-là', 'Most vouchers that day'), int(r.plafondTitres, l)],
           [T(l, 'Avec une carte : débité', 'With a card: debited'), eur(r.carteTitres, l)],
           [T(l, 'Avec une carte : reste à payer', 'With a card: left to pay'), eur(r.carteReste, l)],
@@ -412,7 +412,7 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
       const why: Record<string, string> = {
         ok: T(l, 'Aucune règle ne bloque ce paiement.', 'No rule blocks this payment.'),
         zone: T(l, 'Hors du département de travail et des départements voisins, la carte ne passe pas.', 'Outside your work département and the neighbouring ones, the card does not work.'),
-        plafond: T(l, `Le plafond de ${eur(E.PLAFOND_JOUR, l)} par jour est atteint ou presque.`, `The ${eur(E.PLAFOND_JOUR, l)} daily limit is reached or nearly.`),
+        plafond: r.passe > 0 ? T(l, `Avec cet achat, le plafond de ${eur(E.PLAFOND_JOUR, l)} par jour est atteint.`, `With this purchase, the ${eur(E.PLAFOND_JOUR, l)} daily limit is reached.`) : T(l, `Le plafond de ${eur(E.PLAFOND_JOUR, l)} par jour est déjà atteint.`, `The ${eur(E.PLAFOND_JOUR, l)} daily limit is already reached.`),
         solde: T(l, 'Le solde de la carte ne couvre pas tout.', 'The card balance does not cover it all.'),
         dimanche: motifTxt('dimanche', l), produit: motifTxt('produit', l), alcool: motifTxt('alcool', l), courses: motifTxt('courses', l),
       };
@@ -432,8 +432,8 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
   /* Carte Edenred : écouler l'ancien millésime avant fin février. */
   millesime: (l, a) => ({
     inputs: [
-      { id: 'solde', label: T(l, 'Solde 2026 restant sur la carte', '2026 balance left on the card'), def: Number(A(a, 'solde', 140)), unit: '€', decimals: 2, max: 5000 },
-      { kind: 'select', id: 'depuis', label: T(l, 'À partir du', 'Starting from'), def: String(A(a, 'depuis', '2027-01-04')), options: [{ value: '2026-12-01', label: T(l, '1er décembre 2026', '1 December 2026') }, { value: '2027-01-04', label: T(l, '4 janvier 2027', '4 January 2027') }, { value: '2027-02-01', label: T(l, '1er février 2027', '1 February 2027') }, { value: '2027-02-15', label: T(l, '15 février 2027', '15 February 2027') }] },
+      { id: 'solde', label: T(l, 'Solde 2026 restant sur la carte', '2026 balance left on the card'), def: Number(A(a, 'solde', 140)), unit: '€', decimals: 2, max: 5000, help: T(l, 'Les titres reçus en 2026 qui restent. Votre solde se lit dans l\'application de la carte : ce site n\'a accès à aucun compte.', 'The 2026 vouchers you still have. Your balance shows in the card\'s app: this site has no access to any account.') },
+      { kind: 'select', id: 'depuis', label: T(l, 'À partir du', 'Starting from'), help: T(l, 'Le jour où vous commencez à dépenser ce solde 2026. Les dates proposées vont de décembre à février : c\'est la période où il faut l\'écouler.', 'The day you start spending this 2026 balance. The dates offered run from December to February: that is when it must be spent.'), def: String(A(a, 'depuis', '2027-01-04')), options: [{ value: '2026-12-01', label: T(l, '1er décembre 2026', '1 December 2026') }, { value: '2027-01-04', label: T(l, '4 janvier 2027', '4 January 2027') }, { value: '2027-02-01', label: T(l, '1er février 2027', '1 February 2027') }, { value: '2027-02-15', label: T(l, '15 février 2027', '15 February 2027') }] },
       { id: 'depense', label: T(l, 'Dépense par jour d\'utilisation', 'Spending per day of use'), def: Number(A(a, 'depense', 10)), unit: '€', decimals: 2, max: 100 },
       { id: 'joursSemaine', label: T(l, 'Jours d\'utilisation par semaine', 'Days of use a week'), def: 5, max: 6, adv: true },
     ],
@@ -443,11 +443,11 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
         label: r.ok ? T(l, 'Solde écoulé à temps', 'Balance spent in time') : T(l, 'Reste au dernier jour', 'Left on the last day'),
         value: r.ok ? T(l, 'Oui', 'Yes') : eur(r.reste, l),
         hyp: T(l, `${int(r.joursUsage, l)} jours d'utilisation jusqu'au ${day(r.dernierJour, l)}, à ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} par jour.`, `${int(r.joursUsage, l)} days of use until ${day(r.dernierJour, l)}, at ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} a day.`),
-        sub: r.ok ? T(l, 'Les titres 2027 ne servent qu\'une fois le solde 2026 épuisé.', '2027 vouchers are only used once the 2026 balance is gone.') : T(l, `Il faudrait ${eur(r.rythmeNecessaire, l)} par jour.\nSinon, échange possible jusqu'au ${day(r.finEchange, l)}.`, `You would need ${eur(r.rythmeNecessaire, l)} a day.\nOtherwise, exchange possible until ${day(r.finEchange, l)}.`),
+        sub: r.ok ? T(l, 'En janvier et février, la carte dépense d\'abord votre solde 2026, puis vos titres 2027.', 'In January and February, the card spends your 2026 balance first, then your 2027 vouchers.') : T(l, `Il faudrait ${eur(r.rythmeNecessaire, l)} par jour.\nSinon, échange possible jusqu'au ${day(r.finEchange, l)}.`, `You would need ${eur(r.rythmeNecessaire, l)} a day.\nOtherwise, exchange possible until ${day(r.finEchange, l)}.`),
         rows: [
           [T(l, 'Dernier jour des titres 2026 sur carte', 'Last day for 2026 card vouchers'), day(r.dernierJour, l)],
-          [T(l, 'Capacité de dépense d\'ici là', 'Spending room until then'), eur(r.capacite, l)],
-          [T(l, 'Fin de l\'échange', 'End of exchange'), day(r.finEchange, l)],
+          [T(l, 'Vous pourriez dépenser d\'ici là, à ce rythme', 'You could spend by then, at this pace'), eur(r.capacite, l)],
+          [T(l, 'Dernier jour pour échanger les titres périmés', 'Last day to exchange expired vouchers'), day(r.finEchange, l)],
         ],
       };
     },
@@ -483,14 +483,14 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
     run: (v) => {
       const r = E.carnet(n(v, 'addition'), n(v, 'valeur'), n(v, 'repasMois'));
       return {
-        label: T(l, 'Monnaie perdue sur un mois en papier', 'Change lost over a month on paper'),
-        value: eur0(r.perteMois, l),
-        hyp: T(l, `${int(n(v, 'repasMois'), l)} déjeuners de ${eur(n(v, 'addition'), l)}, titres papier de ${eur(n(v, 'valeur'), l)} arrondis au titre supérieur.`, `${int(n(v, 'repasMois'), l)} lunches of ${eur(n(v, 'addition'), l)}, ${eur(n(v, 'valeur'), l)} paper vouchers rounded up.`),
-        sub: T(l, `Avec la carte : 0 € perdu.\nSans arrondir : ${eur0(r.complementMois, l)} à compléter dans le mois.`, `With the card: nothing lost.\nWithout rounding up: ${eur0(r.complementMois, l)} to top up over the month.`),
+        label: T(l, 'Monnaie perdue sur un mois en papier, si vous donnez un titre de plus', 'Change lost over a month on paper, if you hand over one more voucher'),
+        value: eur(r.perteMois, l),
+        hyp: T(l, `${int(n(v, 'repasMois'), l)} déjeuners de ${eur(n(v, 'addition'), l)}, titres papier de ${eur(n(v, 'valeur'), l)}. Le commerçant ne rend pas la monnaie : deux façons de payer, deux coûts.`, `${int(n(v, 'repasMois'), l)} lunches of ${eur(n(v, 'addition'), l)}, ${eur(n(v, 'valeur'), l)} paper vouchers. The shop gives no change: two ways to pay, two costs.`),
+        sub: T(l, `Autre façon : donner un titre de moins et payer ${eur(r.complementMois, l)} en plus dans le mois.\nAvec la carte : 0 € perdu, le montant exact est débité.`, `Other way: hand over one voucher less and pay ${eur(r.complementMois, l)} extra over the month.\nWith the card: nothing lost, the exact amount is debited.`),
         rows: [
-          [T(l, 'Titres par déjeuner en arrondissant', 'Vouchers per lunch, rounding up'), r.hautOk ? int(r.haut, l) : T(l, 'au-delà du plafond', 'above the limit')],
-          [T(l, 'Perte par déjeuner', 'Loss per lunch'), eur(r.perte, l)],
-          [T(l, 'Complément par déjeuner sans arrondir', 'Top-up per lunch without rounding'), eur(r.complement, l)],
+          [T(l, 'Si vous donnez un titre de plus : titres par déjeuner', 'If you hand over one more voucher: vouchers per lunch'), r.hautOk ? int(r.haut, l) : T(l, 'au-delà du plafond', 'above the limit')],
+          [T(l, 'Monnaie perdue par déjeuner', 'Change lost per lunch'), eur(r.perte, l)],
+          [T(l, 'Si vous donnez un titre de moins : à payer en plus par déjeuner', 'If you hand over one voucher less: extra to pay per lunch'), eur(r.complement, l)],
         ],
       };
     },
@@ -509,7 +509,7 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
         label: T(l, 'Coût des titres pour le commerce, par mois', 'Cost of vouchers to the shop, per month'),
         value: eur0(r.mois, l),
         hyp: T(l, `${eur0(n(v, 'montant'), l)} encaissés en titres, commission de ${pct(n(v, 'taux'), l)}.`, `${eur0(n(v, 'montant'), l)} taken in vouchers, ${pct(n(v, 'taux'), l)} commission.`),
-        sub: T(l, `Sur un an : ${eur0(r.an, l)}.\nTaux réel : ${pct(r.tauxEffectif, l)} du montant.`, `Over a year: ${eur0(r.an, l)}.\nActual rate: ${pct(r.tauxEffectif, l)} of the amount.`),
+        sub: n(v, 'fixe') > 0 ? T(l, `Sur un an : ${eur0(r.an, l)}.\nAvec les frais fixes, cela fait ${pct(r.tauxEffectif, l)} du montant.`, `Over a year: ${eur0(r.an, l)}.\nWith the fixed fees, that is ${pct(r.tauxEffectif, l)} of the amount.`) : T(l, `Sur un an : ${eur0(r.an, l)}.`, `Over a year: ${eur0(r.an, l)}.`),
         rows: [
           [T(l, 'Reversé au commerce', 'Paid to the shop'), eur0(r.net, l)],
           [T(l, 'Coût annuel', 'Yearly cost'), eur0(r.an, l)],

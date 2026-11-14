@@ -6,7 +6,7 @@ import { carnet, validite } from '../../lib/engine/tr';
    seules sources : liste CNTR (« Up Déjeuner, Up One », papier et carte, Gennevilliers), service-public F21059 (règles),
    rapport du Sénat n° 141 (R. 3262-5 : papier fin janvier, carte fin février ; part dématérialisée 2024). */
 const vc = validite(2026, 'carte'), vp = validite(2026, 'papier');
-const CAS = [[9.2, 8], [12.4, 8], [12.4, 9], [15.8, 9]] as const;
+const CAS = [[12.4, 8], [15.8, 8], [12.4, 9], [15.8, 9]] as const;
 const ex = carnet(12.4, 8, 18);
 
 export default defineGuide({
@@ -29,7 +29,7 @@ export default defineGuide({
     ],
     body: (h) => `<h2>Carnet ou carte UpDéjeuner : la monnaie perdue</h2>
 <p>Sur papier, un titre de ${h.eur(8)} donné pour un repas de ${h.eur(12.4, 2)} oblige à choisir : compléter ${h.eur(4.4, 2)} autrement ou donner un deuxième titre et perdre ${h.eur(3.6, 2)}. Le simulateur fait le compte sur un mois. La ${h.src('sp', 'fiche service-public.fr')} rappelle que la dépense reste limitée à ${h.eur(U.plafondJour)} par jour sur les deux supports. Le tableau compare quatre cas, pour dix-huit déjeuners.</p>
-${h.table(['Déjeuner', 'Valeur du titre', 'Perdu par mois en arrondissant', 'À compléter sans arrondir'], CAS.map(([a, v]) => { const r = carnet(a, v, 18); return [h.eur(a, 2), h.eur(v), h.eur(r.perteMois, 2), h.eur(r.complementMois, 2)]; }), 'Dix-huit déjeuners par mois, titres papier', ['l', 'r', 'r', 'r'])}
+${h.table(['Déjeuner', 'Valeur du titre', 'Un titre de plus : monnaie perdue par mois', 'Un titre de moins : à payer en plus par mois'], CAS.map(([a, v]) => { const r = carnet(a, v, 18); return [h.eur(a, 2), h.eur(v), h.eur(r.perteMois, 2), h.eur(r.complementMois, 2)]; }), 'Dix-huit déjeuners par mois, titres papier', ['l', 'r', 'r', 'r'])}
 <h2>Ce que l'on sait de l'émetteur Up</h2>
 <p>La ${h.src('cntrEmetteurs', 'liste de la CNTR')} inscrit « Up Déjeuner, Up One » parmi les émetteurs qui proposent papier et carte, avec un siège à Gennevilliers. Le ${h.src('rapport', 'rapport du Sénat')} note que ${M.partDemat2024} % des titres étaient dématérialisés en 2024, tous émetteurs confondus. Le site public de l'émetteur a refusé nos lectures automatisées ; nous ne l'avons pas contourné et n'en reprenons aucun chiffre.</p>
 <p>Les règles détaillées ont leur page : ${h.a('validite', 'validité des titres')}, ${h.a('cheque', 'chèque restaurant papier')}, et la ${h.a('emetteurs', 'liste des émetteurs')}.</p>`,
@@ -49,7 +49,7 @@ ${h.table(['Déjeuner', 'Valeur du titre', 'Perdu par mois en arrondissant', 'À
     ],
     body: (h) => `<h2>UpDéjeuner booklet or card: the lost change</h2>
 <p>On paper, an ${h.eur(8)} voucher handed over for a ${h.eur(12.4, 2)} meal forces a choice: top up ${h.eur(4.4, 2)} another way or give a second voucher and lose ${h.eur(3.6, 2)}. The simulator does the sums over a month. The ${h.src('sp', 'service-public.fr guidance')} recalls that spending stays capped at ${h.eur(U.plafondJour)} a day on both formats. The table compares four cases, for eighteen lunches in a month, so you can see how quickly small losses add up.</p>
-${h.table(['Lunch', 'Voucher value', 'Lost a month rounding up', 'To top up without rounding'], CAS.map(([a, v]) => { const r = carnet(a, v, 18); return [h.eur(a, 2), h.eur(v), h.eur(r.perteMois, 2), h.eur(r.complementMois, 2)]; }), 'Eighteen lunches a month, paper vouchers', ['l', 'r', 'r', 'r'])}
+${h.table(['Lunch', 'Voucher value', 'One more voucher: change lost a month', 'One voucher less: extra to pay a month'], CAS.map(([a, v]) => { const r = carnet(a, v, 18); return [h.eur(a, 2), h.eur(v), h.eur(r.perteMois, 2), h.eur(r.complementMois, 2)]; }), 'Eighteen lunches a month, paper vouchers', ['l', 'r', 'r', 'r'])}
 <h2>What is known about the issuer Up</h2>
 <p>The ${h.src('cntrEmetteurs', 'CNTR list')} names "Up Déjeuner, Up One" among issuers offering both paper and card, with a head office in Gennevilliers. The ${h.src('rapport', 'Senate report')} notes that ${M.partDemat2024}% of vouchers were digital in 2024, across all issuers. The issuer's public site refused our automated reads; we did not work around that and quote no figure from it.</p>
 <p>The detailed rules have their own pages: ${h.a('validite', 'voucher expiry')}, ${h.a('cheque', 'paper chèque restaurant')}, and the ${h.a('emetteurs', 'list of issuers')}.</p>`,

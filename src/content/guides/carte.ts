@@ -9,12 +9,12 @@ type Cas = Parameters<typeof diagnostic>[0];
 const base: Cas = { jour: 'semaine', travailleCeJour: false, autorise: false, produit: 'repas', montant: 18, dejaPaye: 0, solde: 60, zone: 'meme', deplacement: false };
 const CAS: Array<[{ fr: string; en: string }, Partial<Cas>]> = [
   [{ fr: 'Déjeuner de 18 €, rien payé avant', en: '€18 lunch, nothing paid before' }, {}],
-  [{ fr: 'Déjeuner de 18 € après un café de 12 €', en: '€18 lunch after a €12 coffee stop' }, { dejaPaye: 12 }],
+  [{ fr: 'Déjeuner de 18 € après un petit-déjeuner de 12 €', en: '€18 lunch after a €12 breakfast' }, { dejaPaye: 12 }],
   [{ fr: 'Dimanche, sans travail ce jour-là', en: 'Sunday, not working that day' }, { jour: 'dimanche' }],
   [{ fr: 'En vacances, trois départements plus loin', en: 'On holiday, three départements away' }, { zone: 'autre' }],
   [{ fr: 'Solde de 9 € sur la carte', en: '€9 left on the card' }, { solde: 9 }],
 ];
-const motifs = { fr: { ok: 'passe', plafond: 'plafond du jour', solde: 'solde insuffisant', zone: 'hors zone', dimanche: 'dimanche', produit: 'produit exclu', alcool: 'alcool', courses: 'courses' }, en: { ok: 'goes through', plafond: 'daily limit', solde: 'low balance', zone: 'outside the area', dimanche: 'Sunday', produit: 'excluded item', alcool: 'alcohol', courses: 'groceries' } };
+const motifs = { fr: { ok: 'rien, le paiement passe', plafond: 'plafond du jour', solde: 'solde insuffisant', zone: 'hors zone', dimanche: 'dimanche', produit: 'produit exclu', alcool: 'alcool', courses: 'courses' }, en: { ok: 'nothing, it goes through', plafond: 'daily limit', solde: 'low balance', zone: 'outside the area', dimanche: 'Sunday', produit: 'excluded item', alcool: 'alcohol', courses: 'groceries' } };
 const rows = (l: 'fr' | 'en') => CAS.map(([t, c]) => { const r = diagnostic({ ...base, ...c }); return [t[l], eur(r.passe, l), motifs[l][r.motif]]; });
 
 export default defineGuide({

@@ -31,6 +31,11 @@ describe('usage', () => {
     expect(E.peutPayer({ ...base, produit: 'alcool' }).motif).toBe('alcool');
   });
 });
+describe('chèque de plus (testeurs naïfs du 2026-11-14)', () => {
+  it('18 € en chèques de 9 € : un 3e chèque dépasserait 25 €', () => expect(E.papier(18, 9)).toMatchObject({ bas: 2, complement: 0, plus: 3, plusOk: false, pertePlus: 0 }));
+  it('13,50 € en chèques de 9 € : un 2e chèque fait perdre 4,50 €', () => expect(E.papier(13.5, 9)).toMatchObject({ bas: 1, plus: 2, plusOk: true, pertePlus: 4.5 }));
+  it('7,80 € en chèques de 9 € : un chèque, 1,20 € perdus', () => expect(E.papier(7.8, 9)).toMatchObject({ bas: 0, plus: 1, plusOk: true, pertePlus: 1.2 }));
+});
 describe('validité', () => {
   it('2026 carte : 28 février 2027, échange au 15 mars', () => expect(E.validite(2026, 'carte')).toMatchObject({ dernierJour: '2027-02-28', finEchange: '2027-03-15' }));
   it('2026 papier : 31 janvier 2027, échange au 15 février', () => expect(E.validite(2026, 'papier')).toMatchObject({ dernierJour: '2027-01-31', finEchange: '2027-02-15' }));
