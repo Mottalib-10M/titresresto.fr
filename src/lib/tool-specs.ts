@@ -48,7 +48,7 @@ const produitOpts = (l: Lang) => [
   { value: 'alcool', label: T(l, 'Vin, bière, alcool', 'Wine, beer, spirits') },
   { value: 'nonalim', label: T(l, 'Produit non alimentaire', 'Non-food item') },
 ];
-const jourOpts = (l: Lang) => [{ value: 'semaine', label: T(l, 'Lun-ven', 'Mon-Fri') }, { value: 'samedi', label: T(l, 'Samedi', 'Saturday') }, { value: 'dimanche', label: T(l, 'Dim./férié', 'Sun./hol.') }];
+const jourOpts = (l: Lang) => [{ value: 'semaine', label: T(l, 'Lun-ven', 'Mon-Fri') }, { value: 'samedi', label: T(l, 'Samedi', 'Saturday') }, { value: 'dimanche', label: T(l, 'Dimanche ou férié', 'Sun. or holiday') }];
 
 function achat(v: V): E.Achat {
   return { annee: Number(s(v, 'annee') || 2026) as 2026 | 2027 | 2028, jour: (s(v, 'jour') || 'semaine') as E.Jour, travailleCeJour: s(v, 'travaille') === 'oui', autorise: s(v, 'autorise') === 'oui', produit: (s(v, 'produit') || 'repas') as E.Produit, montant: n(v, 'montant'), adoptee: s(v, 'adoptee') !== 'non', version: (s(v, 'version') || 'senat') as 'an' | 'senat' };
@@ -65,15 +65,16 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
       const m = E.mois(n(v, 'titres'), n(v, 'valeur'), n(v, 'taux'));
       const p = E.partage(n(v, 'valeur'), n(v, 'taux'));
       return {
-        label: T(l, 'Ce que votre employeur paie de vos repas ce mois-ci', 'What your employer pays towards your meals this month'),
+        // Testeurs naïfs du 2026-11-14 (tour 2) : « 100 € » et « Vous payez 100 € » côte à côte ; chaque montant dit qui le paie.
+        label: T(l, 'Votre employeur paie, ce mois-ci', 'Your employer pays, this month'),
         value: eur0(m.employeur, l),
-        hyp: T(l, `Vous payez ${eur0(m.retenue, l)} (retenus sur votre salaire) et vous recevez ${eur0(m.credite, l)} à dépenser en repas : ${eur0(m.employeur, l)} de plus que ce que vous avez payé.`, `You pay ${eur0(m.retenue, l)} (deducted from your pay) and receive ${eur0(m.credite, l)} to spend on meals: ${eur0(m.employeur, l)} more than you paid.`),
+        hyp: T(l, `Retenu sur votre salaire : ${eur0(m.retenue, l)}. À dépenser en repas : ${eur0(m.credite, l)}, la part de votre employeur plus la vôtre.`, `Deducted from your pay: ${eur0(m.retenue, l)}. To spend on meals: ${eur0(m.credite, l)}, your employer's share plus yours.`),
         sub: p.tauxOk
           ? (p.reintegre > 0 ? T(l, `Au-delà de ${eur(PL, l)} par titre, ${eur(p.reintegre, l)} par titre sont taxés comme du salaire.`, `Above ${eur(PL, l)} per voucher, ${eur(p.reintegre, l)} per voucher is taxed like pay.`) : T(l, 'Vous ne payez ni charges ni impôt sur la part de l\'employeur.', 'You pay no social charges or income tax on the employer share.'))
           : T(l, `Hors de la fourchette ${TAUX_TXT(l)}, la part de l'employeur est taxée comme du salaire.`, `Outside ${TAUX_TXT(l)}, the employer share is taxed like pay.`),
         rows: [
-          [T(l, 'À dépenser en repas (carte ou titres)', 'To spend on meals (card or vouchers)'), eur0(m.credite, l)],
           [T(l, 'Retenu sur votre salaire', 'Deducted from your pay'), eur0(m.retenue, l)],
+          [T(l, 'À dépenser en repas (carte ou titres)', 'To spend on meals (card or vouchers)'), eur0(m.credite, l)],
           [T(l, 'Part de l\'employeur sans charges ni impôt', 'Employer share free of charges and tax'), eur0(m.exonere, l)],
           [T(l, 'Part de l\'employeur taxée comme du salaire', 'Employer share taxed like pay'), eur0(m.reintegre, l)],
         ],
@@ -272,7 +273,7 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
         rows: [
           [T(l, 'Titres restants', 'Vouchers left'), int(t, l)],
           [T(l, 'Valeur des titres en moins', 'Value of vouchers lost'), eur0(perdu.credite, l)],
-          [T(l, 'Retenue économisée', 'Deduction saved'), eur0(perdu.retenue, l)],
+          [T(l, 'Retenu en moins sur votre salaire', 'Less deducted from your pay'), eur0(perdu.retenue, l)],
         ],
         note: T(l, 'Un accord d\'entreprise peut maintenir les titres pendant une absence ; ces titres-là ne sont alors pas exonérés.', 'A company agreement can keep vouchers going during an absence; those vouchers are then not exempt.'),
       };
@@ -329,7 +330,7 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
   papier: (l, a) => ({
     inputs: [
       { id: 'addition', label: T(l, 'Montant de l\'addition', 'Bill amount'), def: Number(A(a, 'addition', 23.5)), unit: '€', decimals: 2, max: 500 },
-      VALEUR(l, Number(A(a, 'valeur', 9))),
+      { ...VALEUR(l, Number(A(a, 'valeur', 9))), help: T(l, 'Le montant imprimé sur le titre papier.', 'The amount printed on the paper voucher.') },
     ],
     run: (v) => {
       const r = E.papier(n(v, 'addition'), n(v, 'valeur'));
@@ -399,7 +400,7 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
     inputs: [
       { id: 'montant', label: T(l, 'Montant à payer', 'Amount to pay'), def: Number(A(a, 'montant', 18)), unit: '€', decimals: 2, max: 500 },
       { id: 'dejaPaye', label: T(l, 'Déjà payé en titres aujourd\'hui', 'Already paid with vouchers today'), def: Number(A(a, 'dejaPaye', 12)), unit: '€', decimals: 2, max: 100 },
-      { kind: 'select', id: 'zone', label: T(l, 'Le commerce est situé', 'The shop is located'), def: String(A(a, 'zone', 'meme')), options: [{ value: 'meme', label: T(l, 'Mon département de travail', 'My work département') }, { value: 'limitrophe', label: T(l, 'Département voisin', 'Neighbouring one') }, { value: 'autre', label: T(l, 'Plus loin', 'Further away') }] },
+      { kind: 'select', id: 'zone', label: T(l, 'Le commerce est situé', 'The shop is located'), wide: true, help: T(l, 'Plus loin que votre département de travail et ses voisins, la carte est refusée, sauf titres prévus pour un déplacement.', 'Beyond your work département and its neighbours, the card is refused, unless the vouchers are set up for a business trip.'), def: String(A(a, 'zone', 'meme')), options: [{ value: 'meme', label: T(l, 'Mon département de travail', 'My work département') }, { value: 'limitrophe', label: T(l, 'Département voisin', 'Neighbouring one') }, { value: 'autre', label: T(l, 'Plus loin', 'Further away') }] },
       { kind: 'choice', id: 'jour', label: T(l, 'Jour', 'Day'), def: String(A(a, 'jour', 'semaine')), options: jourOpts(l) },
       { kind: 'choice', id: 'travaille', label: T(l, 'Vous travaillez ce jour-là ?', 'Are you working that day?'), def: 'non', options: yn(l), when: (v) => s(v, 'jour') === 'dimanche' },
       { kind: 'choice', id: 'autorise', label: T(l, 'L\'employeur l\'a prévu ?', 'Has the employer allowed it?'), def: 'non', options: yn(l), when: (v) => s(v, 'jour') === 'dimanche' },
@@ -420,7 +421,10 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
         label: r.ok ? T(l, 'Payable avec la carte', 'Payable with the card') : T(l, 'Paiement refusé', 'Payment refused'),
         value: eur(r.passe, l),
         hyp: why[r.motif],
-        sub: T(l, `Reste à payer autrement : ${eur(Math.max(0, n(v, 'montant') - r.passe), l)}.`, `Left to pay another way: ${eur(Math.max(0, n(v, 'montant') - r.passe), l)}.`),
+        // Testeurs naïfs du 2026-11-14 (tour 2) : « 13 € payables » contre « au-delà, le paiement est bloqué » ; on dit le geste en caisse.
+        sub: r.ok && r.passe < n(v, 'montant')
+          ? T(l, `Reste à payer autrement : ${eur(n(v, 'montant') - r.passe, l)}.\nEn caisse, demandez de passer ${eur(r.passe, l)} sur la carte : présentée pour ${eur(n(v, 'montant'), l)}, elle serait refusée.`, `Left to pay another way: ${eur(n(v, 'montant') - r.passe, l)}.\nAt the till, ask for ${eur(r.passe, l)} on the card: presented for ${eur(n(v, 'montant'), l)}, it would be refused.`)
+          : T(l, `Reste à payer autrement : ${eur(Math.max(0, n(v, 'montant') - r.passe), l)}.`, `Left to pay another way: ${eur(Math.max(0, n(v, 'montant') - r.passe), l)}.`),
         rows: [
           [T(l, 'Encore permis aujourd\'hui', 'Still allowed today'), eur(E.cumulJour(n(v, 'dejaPaye'), 0).resteDuJour, l)],
           [T(l, 'Montant demandé', 'Amount asked'), eur(n(v, 'montant'), l)],
@@ -439,14 +443,19 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
     ],
     run: (v) => {
       const r = E.ancienSolde(n(v, 'solde'), s(v, 'depuis'), n(v, 'depense'), n(v, 'joursSemaine'));
+      const vide = E.ecouler(n(v, 'solde'), n(v, 'depense'), n(v, 'joursSemaine')).jours;
       return {
         label: r.ok ? T(l, 'Solde écoulé à temps', 'Balance spent in time') : T(l, 'Reste au dernier jour', 'Left on the last day'),
         value: r.ok ? T(l, 'Oui', 'Yes') : eur(r.reste, l),
-        hyp: T(l, `${int(r.joursUsage, l)} jours d'utilisation jusqu'au ${day(r.dernierJour, l)}, à ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} par jour.`, `${int(r.joursUsage, l)} days of use until ${day(r.dernierJour, l)}, at ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} a day.`),
+        // Testeurs naïfs du 2026-11-14 (tour 2) : « 400 € » à côté d'un solde de 140 € faisait croire à un manque ; on dit en combien de jours le solde est vidé.
+        hyp: r.ok
+          ? T(l, `À ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} par jour, vos ${eur(n(v, 'solde'), l)} sont dépensés en ${int(vide, l)} jours d'utilisation, sur ${int(r.joursUsage, l)} possibles avant le ${day(r.dernierJour, l)}.`, `At ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} a day, your ${eur(n(v, 'solde'), l)} is spent in ${int(vide, l)} days of use, out of ${int(r.joursUsage, l)} available before ${day(r.dernierJour, l)}.`)
+          : T(l, `${int(r.joursUsage, l)} jours d'utilisation jusqu'au ${day(r.dernierJour, l)}, à ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} par jour.`, `${int(r.joursUsage, l)} days of use until ${day(r.dernierJour, l)}, at ${eur(Math.min(n(v, 'depense'), E.PLAFOND_JOUR), l)} a day.`),
         sub: r.ok ? T(l, 'En janvier et février, la carte dépense d\'abord votre solde 2026, puis vos titres 2027.', 'In January and February, the card spends your 2026 balance first, then your 2027 vouchers.') : T(l, `Il faudrait ${eur(r.rythmeNecessaire, l)} par jour.\nSinon, échange possible jusqu'au ${day(r.finEchange, l)}.`, `You would need ${eur(r.rythmeNecessaire, l)} a day.\nOtherwise, exchange possible until ${day(r.finEchange, l)}.`),
         rows: [
           [T(l, 'Dernier jour des titres 2026 sur carte', 'Last day for 2026 card vouchers'), day(r.dernierJour, l)],
-          [T(l, 'Vous pourriez dépenser d\'ici là, à ce rythme', 'You could spend by then, at this pace'), eur(r.capacite, l)],
+          [T(l, 'Jours d\'utilisation pour vider le solde', 'Days of use to empty the balance'), int(vide, l)],
+          [T(l, 'Dépense possible jusqu\'au dernier jour, à ce rythme', 'Possible spending up to the last day, at this pace'), eur(r.capacite, l)],
           [T(l, 'Dernier jour pour échanger les titres périmés', 'Last day to exchange expired vouchers'), day(r.finEchange, l)],
         ],
       };
@@ -477,20 +486,40 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
   carnet: (l, a) => ({
     inputs: [
       { id: 'addition', label: T(l, 'Déjeuner habituel', 'Usual lunch'), def: Number(A(a, 'addition', 12.4)), unit: '€', decimals: 2, max: 200 },
-      VALEUR(l, Number(A(a, 'valeur', 8))),
+      { ...VALEUR(l, Number(A(a, 'valeur', 8))), help: T(l, 'Le montant imprimé sur le titre papier.', 'The amount printed on the paper voucher.') },
       { id: 'repasMois', label: T(l, 'Déjeuners par mois', 'Lunches a month'), def: Number(A(a, 'repasMois', 18)), max: 31 },
     ],
     run: (v) => {
-      const r = E.carnet(n(v, 'addition'), n(v, 'valeur'), n(v, 'repasMois'));
+      const o = E.carnet(n(v, 'addition'), n(v, 'valeur'), n(v, 'repasMois'));
+      const nb = (k: number) => T(l, k > 1 ? `${int(k, l)} titres` : `${int(k, l)} titre`, k > 1 ? `${int(k, l)} vouchers` : `${int(k, l)} voucher`);
+      const mois = int(o.repas, l);
+      // Testeurs naïfs du 2026-11-14 (tour 2) : « un titre de plus » ne se comprenait pas ; chaque choix est nommé par son nombre de titres.
+      const lignes = o.juste
+        ? [T(l, `Payer avec ${nb(o.bas)} : le compte est juste, rien n'est perdu.`, `Pay with ${nb(o.bas)}: it adds up exactly, nothing is lost.`)]
+        : [
+            o.hautOk
+              ? T(l, `Payer avec ${nb(o.haut)} : vous perdez ${eur(o.perte, l)} de monnaie.`, `Pay with ${nb(o.haut)}: you lose ${eur(o.perte, l)} in change.`)
+              : T(l, `Payer avec ${nb(o.haut)} : impossible, au-delà de ${eur(E.PLAFOND_JOUR, l)} par jour.`, `Pay with ${nb(o.haut)}: not allowed, above ${eur(E.PLAFOND_JOUR, l)} a day.`),
+            o.bas === 0
+              ? T(l, `Payer sans titre : vous payez ${eur(o.complement, l)} de votre poche.`, `Pay without a voucher: you pay ${eur(o.complement, l)} yourself.`)
+              : T(l, `Payer avec ${nb(o.bas)} : vous complétez ${eur(o.complement, l)} de votre poche (ce n'est pas une perte : le titre gardé sert un autre jour).`, `Pay with ${nb(o.bas)}: you add ${eur(o.complement, l)} yourself (not a loss: the voucher you keep is used another day).`),
+          ];
+      const carte = o.carteReste > 0
+        ? T(l, `Avec la carte : ${eur(o.carteTitres, l)} débités au centime près (plafond du jour), ${eur(o.carteReste, l)} à payer autrement ; rien n'est perdu.`, `With the card: ${eur(o.carteTitres, l)} debited to the cent (daily limit), ${eur(o.carteReste, l)} to pay another way; nothing is lost.`)
+        : T(l, `Avec la carte : ${eur(o.carteTitres, l)} débités au centime près sur votre solde, rien n'est perdu.`, `With the card: ${eur(o.carteTitres, l)} debited to the cent from your balance, nothing is lost.`);
+      const perdre = !o.juste && o.hautOk;
       return {
-        label: T(l, 'Monnaie perdue sur un mois en papier, si vous donnez un titre de plus', 'Change lost over a month on paper, if you hand over one more voucher'),
-        value: eur(r.perteMois, l),
-        hyp: T(l, `${int(n(v, 'repasMois'), l)} déjeuners de ${eur(n(v, 'addition'), l)}, titres papier de ${eur(n(v, 'valeur'), l)}. Le commerçant ne rend pas la monnaie : deux façons de payer, deux coûts.`, `${int(n(v, 'repasMois'), l)} lunches of ${eur(n(v, 'addition'), l)}, ${eur(n(v, 'valeur'), l)} paper vouchers. The shop gives no change: two ways to pay, two costs.`),
-        sub: T(l, `Autre façon : donner un titre de moins et payer ${eur(r.complementMois, l)} en plus dans le mois.\nAvec la carte : 0 € perdu, le montant exact est débité.`, `Other way: hand over one voucher less and pay ${eur(r.complementMois, l)} extra over the month.\nWith the card: nothing lost, the exact amount is debited.`),
-        rows: [
-          [T(l, 'Si vous donnez un titre de plus : titres par déjeuner', 'If you hand over one more voucher: vouchers per lunch'), r.hautOk ? int(r.haut, l) : T(l, 'au-delà du plafond', 'above the limit')],
-          [T(l, 'Monnaie perdue par déjeuner', 'Change lost per lunch'), eur(r.perte, l)],
-          [T(l, 'Si vous donnez un titre de moins : à payer en plus par déjeuner', 'If you hand over one voucher less: extra to pay per lunch'), eur(r.complement, l)],
+        label: o.juste
+          ? T(l, `Monnaie perdue sur un mois (${mois} déjeuners)`, `Change lost over a month (${mois} lunches)`)
+          : perdre
+            ? T(l, `Monnaie perdue sur un mois (${mois} déjeuners) en payant avec ${nb(o.haut)}`, `Change lost over a month (${mois} lunches) paying with ${nb(o.haut)}`)
+            : T(l, `Complété de votre poche sur un mois (${mois} déjeuners) en payant avec ${nb(o.bas)}`, `Paid yourself over a month (${mois} lunches) paying with ${nb(o.bas)}`),
+        value: eur(perdre ? o.perteMois : o.juste ? 0 : o.complementMois, l),
+        hyp: T(l, `Pour un déjeuner de ${eur(n(v, 'addition'), l)} avec des titres papier de ${eur(n(v, 'valeur'), l)} : le commerçant ne rend pas la monnaie.`, `For a ${eur(n(v, 'addition'), l)} lunch with ${eur(n(v, 'valeur'), l)} paper vouchers: the shop gives no change.`),
+        sub: [...lignes, carte].join('\n'),
+        rows: o.juste ? [[T(l, 'Avec la carte, sur le mois', 'With the card, over the month'), T(l, '0 € perdu', 'nothing lost')]] : [
+          ...(perdre ? [[T(l, `Sur le mois, avec ${nb(o.bas)} : complété de votre poche`, `Over the month, with ${nb(o.bas)}: paid yourself`), eur(o.complementMois, l)] as [string, string]] : []),
+          [T(l, 'Sur le mois, avec la carte : monnaie perdue', 'Over the month, with the card: change lost'), eur(0, l)],
         ],
       };
     },

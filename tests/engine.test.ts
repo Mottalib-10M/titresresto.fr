@@ -58,3 +58,29 @@ describe('simulateurs', () => {
     expect(o.value.length).toBeGreaterThan(0);
   });
 });
+describe('résultats clarifiés (testeurs naïfs du 2026-11-14, tour 2)', () => {
+  const plat = (s: string) => s.replace(/[  ]/g, ' ');
+  it('accueil : chaque montant dit qui le paie, et 10 € à 50 % × 20 = 100 € + 100 € = 200 €', () => {
+    const m = E.mois(20, 10, 50); expect(m).toMatchObject({ employeur: 100, retenue: 100, credite: 200 });
+    const o = runTool('partage', 'fr');
+    expect(plat(o.label)).toBe('Votre employeur paie, ce mois-ci'); expect(plat(o.value)).toBe('100 €');
+    expect(plat(o.hyp!)).toBe('Retenu sur votre salaire : 100 €. À dépenser en repas : 200 €, la part de votre employeur plus la vôtre.');
+  });
+  it('UpDéjeuner : 12,40 € en titres de 8 € — 2 titres perdent 3,60 €, 1 titre laisse 4,40 € à compléter', () => {
+    expect(E.carnet(12.4, 8, 18)).toMatchObject({ haut: 2, bas: 1, perte: 3.6, complement: 4.4, perteMois: 64.8, complementMois: 79.2, juste: false });
+    const o = runTool('carnet', 'fr');
+    expect(plat(o.label)).toBe('Monnaie perdue sur un mois (18 déjeuners) en payant avec 2 titres'); expect(plat(o.value)).toBe('64,80 €');
+    expect(plat(o.sub!).split('\n')).toEqual([
+      'Payer avec 2 titres : vous perdez 3,60 € de monnaie.',
+      'Payer avec 1 titre : vous complétez 4,40 € de votre poche (ce n\'est pas une perte : le titre gardé sert un autre jour).',
+      'Avec la carte : 12,40 € débités au centime près sur votre solde, rien n\'est perdu.',
+    ]);
+    expect(plat(o.rows[0][1])).toBe('79,20 €');
+  });
+  it('UpDéjeuner : compte juste (16 € en titres de 8 €) et addition au-delà du plafond (30 €)', () => {
+    expect(plat(runTool('carnet', 'fr', undefined, { addition: 16 }).sub!)).toMatch(/^Payer avec 2 titres : le compte est juste/);
+    const o = runTool('carnet', 'fr', undefined, { addition: 30 });
+    expect(plat(o.sub!)).toMatch(/Payer avec 4 titres : impossible/); expect(plat(o.value)).toBe('108 €');
+  });
+  it('Edenred : 140 € à 10 € par jour = 14 jours pour vider le solde', () => expect(plat(runTool('millesime', 'fr').hyp!)).toMatch(/vos 140 € sont dépensés en 14 jours d'utilisation/));
+});

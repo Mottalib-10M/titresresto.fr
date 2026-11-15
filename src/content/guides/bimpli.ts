@@ -17,14 +17,14 @@ export default defineGuide({
   sources: ['swileCga', 'cntrAgrement', 'rapport', 'sp'],
   fr: {
     slug: 'bimpli-commercant',
-    nav: 'Bimpli commerçant', card: 'Accepter les titres Bimpli et les autres : l\'agrément, le contrat et la commission',
+    nav: 'Bimpli commerçant', card: 'Pour les commerçants : accepter les titres Bimpli et les autres : l\'agrément, le contrat et la commission',
     title: 'Bimpli commerçant 2026 : accepter les titres et leur coût',
     description: 'Bimpli commerçant en 2026 : agrément de la CNTR, contrat d\'affiliation avec l\'émetteur, commission sur chaque paiement. Simulateur : ce que coûtent les titres.',
     h1: 'Bimpli commerçant : accepter les titres-restaurant et ce que ça coûte',
     intro: 'Tapez ce que votre commerce encaisse en titres chaque mois et la commission de l\'émetteur : le simulateur donne ce que l\'acceptation coûte au commerçant, par mois et par an, pour Bimpli comme pour les autres.',
     resume: `Un commerçant qui veut accepter les titres Bimpli passe par deux étapes. D'abord l'agrément de la Commission nationale des titres-restaurant, commun à tous les émetteurs : la CNTR décrit une demande en trois temps, choix de l'activité, dossier, envoi par courrier, et annonce un délai de traitement de ${EM.delaiAgrementJoursOuvres} jours ouvrés. Ensuite un contrat d'affiliation avec chaque émetteur. Pour Bimpli, ce sont les conditions générales d'affiliation de Swile, qui précisent que Bimpli est une marque dont Swile est propriétaire. Chaque émetteur prélève une commission sur les paiements : le rapport du Sénat l'évalue à ${T} % en moyenne. Pour ${eur(3000, 'fr')} encaissés en titres par mois, cela représente ${eur(ex.mois, 'fr')} par mois et ${eur(ex.an, 'fr')} par an. Un commerce reste libre de refuser les titres. Ce site est indépendant et n'est affilié ni à Bimpli ni à Swile.`,
     faqs: [
-      { open: true, q: 'Comment un commerçant accepte-t-il les titres Bimpli ?', a: `Il lui faut l'agrément de la CNTR, qui vaut pour tous les émetteurs, puis un contrat d'affiliation avec l'émetteur, ici les conditions générales d'affiliation de Swile pour la marque Bimpli. La CNTR annonce ${EM.delaiAgrementJoursOuvres} jours ouvrés de traitement. Le terminal doit ensuite être paramétré pour les cartes de titres ; votre banque ou votre fournisseur de terminal vous le confirmera.` },
+      { open: true, q: 'Comment un commerçant accepte-t-il les titres Bimpli ?', a: `Il lui faut l'agrément de la CNTR, qui vaut pour tous les émetteurs, puis un contrat avec l'émetteur, dit contrat d'affiliation : ici les conditions générales de Swile, car Bimpli est une marque de la société Swile. La CNTR annonce ${EM.delaiAgrementJoursOuvres} jours ouvrés (du lundi au vendredi) de traitement. Le terminal doit ensuite être paramétré pour les cartes de titres ; votre banque ou votre fournisseur de terminal vous le confirmera.` },
       { q: 'Un commerce est-il obligé d\'accepter les titres-restaurant ?', a: 'Non. Selon service-public.fr, les restaurants et les commerces ne sont pas tenus d\'accepter les titres. Un commerçant peut aussi accepter certains émetteurs et pas d\'autres, ou limiter la liste des produits payables en titres. L\'afficher en caisse évite des refus au moment de payer.' },
       { q: 'Combien coûte l\'acceptation des titres-restaurant pour un commerçant ?', a: `Une commission prélevée par l'émetteur sur chaque paiement, parfois avec des frais fixes, selon le contrat. Le rapport du Sénat cite une commission moyenne de ${T} %. Le simulateur applique le taux que vous saisissez : reportez celui de votre contrat pour un chiffre exact.` },
     ],
@@ -37,7 +37,7 @@ ${h.table(['Encaissé en titres par mois', 'Commission par mois', 'Commission pa
   },
   en: {
     slug: 'bimpli-commercant',
-    nav: 'Bimpli commerçant', card: 'Accepting Bimpli and other vouchers: approval, contract and commission',
+    nav: 'Bimpli commerçant', card: 'For shops: accepting Bimpli and other vouchers: approval, contract and commission',
     title: 'Bimpli commerçant 2026: accepting meal vouchers and the cost',
     description: 'Bimpli commerçant in France for 2026: CNTR approval, an affiliation contract with the issuer, a commission on each payment. Simulator: what vouchers cost shops.',
     h1: 'Bimpli commerçant: accepting meal vouchers and what it costs',

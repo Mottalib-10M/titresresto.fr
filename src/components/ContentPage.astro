@@ -23,15 +23,19 @@ const jsonLd = [webApplicationSchema({ name: x.h1, description: x.description, p
 if (x.faqs.length) jsonLd.push(faqSchema(x.faqs, lang));
 const related = page.related.filter((id) => hasRoute(id, lang)).map((id) => ({ href: route(id, lang), name: label(id, lang), description: guideById(id)?.[lang]?.card ?? (id === 'home' ? HOME[lang].homeCard : '') }));
 const sources = sourceList(page.sources, lang);
+// Testeurs naïfs du 2026-11-14 (tour 2) : pages commerçant et employeur prises pour des pages salarié ; elles le disent en tête.
+const PUBLIC: Record<string, Record<Locale, string>> = { bimpli: { fr: 'Page pour les commerçants', en: 'Page for shops' }, employeur: { fr: 'Page pour les employeurs', en: 'Page for employers' } } as Record<string, Record<Locale, string>>;
+const pour = PUBLIC[page.id]?.[lang];
 ---
 <PageLayout title={x.title} description={x.description} lang={lang} jsonLd={jsonLd} faqs={x.faqs} related={related} sources={sources} breadcrumbs={[{ label: group.label[lang] }, { label: x.nav }]}>
   <article>
     <header class="mb-4">
       <h1 class="text-[1.7rem] font-bold text-navy-900 max-sm:leading-tight sm:text-3xl md:text-4xl">{x.h1}</h1>
+      {pour && <div class="mt-2 inline-block rounded bg-navy-100 px-2 py-0.5 text-sm font-semibold text-navy-800">{pour}</div>}
       <p class="mt-2 text-base text-navy-700 sm:text-lg">{x.intro}</p>
       <div class="mt-1 text-xs font-medium uppercase tracking-wide text-navy-500">{ui.independent}</div>
       {/* Parcours débutant (testeurs du 2026-11-08 : arrivés de Google sur une page de détail, ils ne savaient pas par où commencer). */}
-      <p data-chrome class="mt-1 text-sm"><a href={`${route('home', lang)}#simulateur`} class="font-medium text-accent-700 underline">{lang === 'fr' ? 'Votre mois de titres-restaurant en un écran : le simulateur de l\'accueil →' : 'Your month of meal vouchers on one screen: the home simulator →'}</a></p>
+      <p data-chrome class="mt-1 text-sm"><a href={`${route('home', lang)}#simulateur`} class="font-medium text-accent-700 underline">{pour ? (lang === 'fr' ? 'Vous êtes salarié ? Votre mois de titres-restaurant en un écran : le simulateur de l\'accueil →' : 'Are you an employee? Your month of meal vouchers on one screen: the home simulator →') : (lang === 'fr' ? 'Votre mois de titres-restaurant en un écran : le simulateur de l\'accueil →' : 'Your month of meal vouchers on one screen: the home simulator →')}</a></p>
     </header>
     <div data-outil data-chrome class="mb-4"><Tool kind={page.tool} lang={lang} arg={page.toolArg} idPrefix={`p${page.order}`} /></div>
     {/* La date de relecture n'est plus répétée ici : le bloc éditeur et le pied de page la donnent (testeurs du 2026-11-10). */}

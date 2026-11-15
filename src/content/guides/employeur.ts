@@ -15,7 +15,7 @@ export default defineGuide({
   sources: ['sp', 'rapport', 'texteCommission'],
   fr: {
     slug: 'cout-employeur',
-    nav: 'Coût pour l\'employeur', card: 'Budget annuel des titres pour une équipe, part exonérée et part soumise aux cotisations',
+    nav: 'Coût pour l\'employeur', card: 'Pour les employeurs : budget annuel des titres pour une équipe, part exonérée et part soumise aux cotisations',
     title: 'Part employeur titre-restaurant 2026 : coût et exonération',
     description: 'Part employeur du titre-restaurant en 2026 : coût annuel pour une équipe, part exonérée jusqu\'à 7,32 € par titre et part soumise aux cotisations, en un calcul.',
     h1: 'Part employeur du titre-restaurant : le coût d\'une équipe en 2026',
@@ -36,7 +36,7 @@ ${h.table(['Valeur et taux', 'Part employeur sur un an', 'Dont soumis aux cotisa
   },
   en: {
     slug: 'employer-cost',
-    nav: 'Cost to the employer', card: 'Annual voucher budget for a team, the exempt part and the part subject to contributions',
+    nav: 'Cost to the employer', card: 'For employers: annual voucher budget for a team, the exempt part and the part subject to contributions',
     title: 'Employer meal voucher contribution 2026: cost and exemption',
     description: 'Employer contribution to French meal vouchers in 2026: annual cost for a team, the share exempt up to €7.32 per voucher and the part subject to contributions.',
     h1: 'Employer meal voucher contribution: what a team costs in 2026',

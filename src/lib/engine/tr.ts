@@ -179,7 +179,8 @@ export function cumulJour(dejaPaye: number, achat: number) {
 export function carnet(addition: number, valeur: number, repasMois: number) {
   const p = papier(addition, valeur);
   const n = Math.max(0, Math.floor(repasMois));
-  return { ...p, perteMois: r2(n * p.perte), complementMois: r2(n * p.complement), titresMois: n * (p.hautOk ? p.haut : p.bas) };
+  // juste : l'addition tombe pile sur un nombre de titres (ni monnaie perdue, ni complément).
+  return { ...p, repas: n, juste: p.complement === 0, perteMois: r2(n * p.perte), complementMois: r2(n * p.complement), titresMois: n * (p.hautOk ? p.haut : p.bas) };
 }
 
 /** Coût d'acceptation pour un commerçant : commission en % du montant encaissé en titres, plus un fixe par paiement. */
