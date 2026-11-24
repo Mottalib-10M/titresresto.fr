@@ -219,7 +219,7 @@ export const SPECS: Record<string, (l: Lang, a?: Args) => ToolSpec> = {
         label: T(l, 'Courses alimentaires en titres', 'Groceries with vouchers'),
         value: r.courses ? T(l, 'Permises', 'Allowed') : T(l, 'Interdites', 'Not allowed'),
         hyp: T(l, `Au ${day(s(v, 'date'), l)}, ${s(v, 'adoptee') === 'oui' ? T(l, 'si la loi est votée', 'if the bill passes') : T(l, 'si la loi est rejetée', 'if the bill fails')}.`, `On ${day(s(v, 'date'), l)}, ${s(v, 'adoptee') === 'oui' ? 'if the bill passes' : 'if the bill fails'}.`),
-        sub: T(l, 'Hypothèse : le texte n\'est pas promulgué au 13 novembre 2026.', 'Assumption: the bill is not law as of 13 November 2026.'),
+        sub: T(l, 'Hypothèse : le texte n\'est pas promulgué au 23 novembre 2026.', 'Assumption: the bill is not law as of 23 November 2026.'),
         rows: [
           [T(l, 'Dimanche pour tous', 'Sundays for everyone'), o(r.dimancheTous)],
           [T(l, 'Titres papier', 'Paper vouchers'), r.papier ? T(l, 'encore émis', 'still issued') : T(l, 'fin', 'ended')],

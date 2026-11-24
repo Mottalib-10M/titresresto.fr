@@ -26,7 +26,7 @@ const f = K.fourchetteOptimale();
     <h2>What is calculated and what is not</h2>
     <p>Amounts are exact under the 2026 rules: exempt share, share added back, deduction, monthly credit, annual cost before fees. The exemption cap for 2027 vouchers had not been published as of {d(P.retrieved_at)}: no 2027 figure is shown. The daily limits a decree would set if the Senate version passed are unknown and are not made up. Issuer fees, each chain's product lists and card-specific rules are not calculated.</p>
     <h2>Assumptions about the bill</h2>
-    <p>Until the law is enacted, every 2027 and 2028 rule is shown as an assumption: bill passed or rejected, National Assembly version or the Senate committee version of {d(PPL.commission)}. The Senate plenary debate is scheduled for {d(PPL.seanceSenat)}. The <Fragment set:html={s('dossier', 'legislative file')} /> is re-read at each stage.</p>
+    <p>Until the law is enacted, every 2027 and 2028 rule is shown as an assumption: bill passed or rejected, National Assembly version or the Senate committee version of {d(PPL.commission)}. The Senate passed the text, amended, on {d(PPL.adoptionSenat)}; a joint committee must follow. The <Fragment set:html={s('dossier', 'legislative file')} /> is re-read at each stage.</p>
     <h2>Tests</h2>
     <p>The rules have automated tests drawn from the texts: the {eur(f.min, 2)} to {eur(f.max, 2)} range given by the Senate report, a €14 voucher at 60% with €1.08 added back, a 70% rate that removes the whole exemption, a €32 bill cut to €25, a 2026 card voucher valid until 28 February 2027. The site does not build if a test fails.</p>
     <h2>How the Titres Resto method is kept up to date</h2>
