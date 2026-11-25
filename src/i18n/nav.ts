@@ -6,9 +6,10 @@ const CORE: Record<Locale, Record<string, string>> = {
   fr: { home: 'Simulateur titres-restaurant', method: 'Méthode de calcul', about: 'À propos', widget: 'Intégrer le simulateur', contact: 'Contact', editorial: 'Politique éditoriale', privacy: 'Confidentialité', terms: 'Mentions légales', cookies: 'Cookies' },
   en: { home: 'Meal voucher simulator', method: 'How we calculate', about: 'About', widget: 'Embed the simulator', contact: 'Contact', editorial: 'Editorial policy', privacy: 'Privacy', terms: 'Legal notice', cookies: 'Cookies' },
 };
-export const GROUPS: Array<{ id: Group; label: Record<Locale, string> }> = [
-  { id: 'essentiel', label: { fr: 'Ticket restaurant, chèque, ticket repas', en: 'Ticket restaurant, chèque, ticket repas' } },
-  { id: 'argent', label: { fr: 'Part employeur et plafonds', en: 'Employer share and caps' } },
+// menu : intitulé court du menu du haut (le libellé long débordait de la barre dès 1 440 px).
+export const GROUPS: Array<{ id: Group; label: Record<Locale, string>; menu?: Record<Locale, string> }> = [
+  { id: 'essentiel', label: { fr: 'Ticket restaurant, chèque, ticket repas', en: 'Ticket restaurant, chèque, ticket repas' }, menu: { fr: 'Titres-resto', en: 'Meal vouchers' } },
+  { id: 'argent', label: { fr: 'Part employeur et plafonds', en: 'Employer share and caps' }, menu: { fr: 'Part employeur', en: 'Employer share' } },
   { id: 'usage', label: { fr: 'Où et quand payer', en: 'Where and when to pay' } },
   { id: 'regles', label: { fr: 'Droits et réforme', en: 'Rights and reform' } },
   { id: 'cartes', label: { fr: 'Cartes et émetteurs', en: 'Cards and issuers' } },
@@ -17,7 +18,7 @@ export const label = (id: string, lang: Locale) => CORE[lang][id] ?? guideById(i
 const link = (id: string, lang: Locale): NavLink => ({ href: route(id, lang), label: label(id, lang) });
 export const inGroup = (g: Group, lang: Locale): NavLink[] => GUIDES.filter((p) => p.group === g && hasRoute(p.id, lang)).map((p) => link(p.id, lang));
 export function navCategories(lang: Locale): NavCategory[] {
-  return GROUPS.map((g) => ({ label: g.label[lang], links: inGroup(g.id, lang) })).filter((c) => c.links.length);
+  return GROUPS.map((g) => ({ label: (g.menu ?? g.label)[lang], links: inGroup(g.id, lang) })).filter((c) => c.links.length);
 }
 export const navDirect = (lang: Locale): NavLink[] => [link('method', lang)];
 export const footerColumns = (lang: Locale): NavCategory[] => {
